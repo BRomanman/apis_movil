@@ -1,6 +1,5 @@
-package com.clinica.api.citas.model
+package citas_service_nuevo.model
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -18,13 +17,10 @@ data class Cita(
     @Column(name = "estado", nullable = false)
     var estado: String,
 
-    // --- CAMBIO CLAVE AQUÍ ---
-    // Ahora es una relación, no un simple ID.
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     var usuario: Usuario,
 
-    // --- Y AQUÍ TAMBIÉN ---
     @ManyToOne
     @JoinColumn(name = "id_doctor", nullable = false)
     var doctor: Doctor,

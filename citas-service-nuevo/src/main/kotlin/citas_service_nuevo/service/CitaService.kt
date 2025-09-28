@@ -1,7 +1,7 @@
-package com.clinica.api.citas.service
+package citas_service_nuevo.service
 
-import com.clinica.api.citas.model.Cita
-import com.clinica.api.citas.repository.CitaRepository
+import citas_service_nuevo.model.Cita
+import citas_service_nuevo.repository.CitaRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -30,6 +30,11 @@ class CitaService(private val citaRepository: CitaRepository) {
     }
 
     fun findByUsuario(idUsuario: Long): List<Cita> {
-        return citaRepository.findByIdUsuario(idUsuario)
+        return citaRepository.findByUsuarioId(idUsuario)
+    }
+
+    //Metodo para la funcionalidad de recordatorios
+    fun findProximasByUsuario(idUsuario: Long): List<Cita> {
+        return citaRepository.findByUsuarioIdAndFechaCitaAfter(idUsuario, LocalDateTime.now())
     }
 }

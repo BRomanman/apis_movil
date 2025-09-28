@@ -1,13 +1,12 @@
-package com.clinica.api.citas
+package citas_service_nuevo
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
-@ComponentScan(basePackages = ["com.clinica.api.citas"])
-class CitasServiceApplication
+// Spring Boot escaneará este paquete y todos sus sub-paquetes automáticamente
+class CitasServiceNuevoApplication
 
 fun main(args: Array<String>) {
-    runApplication<CitasServiceApplication>(*args)
+    runApplication<CitasServiceNuevoApplication>(*args)
 }

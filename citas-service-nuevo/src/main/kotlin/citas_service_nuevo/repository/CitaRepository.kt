@@ -1,6 +1,6 @@
-package com.clinica.api.citas.repository
+package citas_service_nuevo.repository
 
-import com.clinica.api.citas.model.Cita
+import citas_service_nuevo.model.Cita
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
@@ -8,7 +8,8 @@ import java.time.LocalDateTime
 @Repository
 interface CitaRepository : JpaRepository<Cita, Long> {
 
-    fun findByIdUsuario(idUsuario: Long): List<Cita>
+    fun findByUsuarioId(idUsuario: Long): List<Cita>
 
-    fun findByIdUsuarioAndFechaCitaAfter(idUsuario: Long, fecha: LocalDateTime): List<Cita>
+    // El metodo se llama findByUsuarioIdAndFechaCitaAfter
+    fun findByUsuarioIdAndFechaCitaAfter(idUsuario: Long, fecha: LocalDateTime): List<Cita>
 }

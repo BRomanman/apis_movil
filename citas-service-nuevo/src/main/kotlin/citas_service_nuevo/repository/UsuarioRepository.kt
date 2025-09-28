@@ -1,6 +1,6 @@
-package com.clinica.api.citas.repository
+package citas_service_nuevo.repository
 
-import com.clinica.api.citas.model.Usuario
+import citas_service_nuevo.model.Usuario
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

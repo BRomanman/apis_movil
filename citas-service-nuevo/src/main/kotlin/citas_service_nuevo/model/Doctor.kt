@@ -1,4 +1,4 @@
-package com.clinica.api.citas.model
+package citas_service_nuevo.model
 
 import jakarta.persistence.*
 
