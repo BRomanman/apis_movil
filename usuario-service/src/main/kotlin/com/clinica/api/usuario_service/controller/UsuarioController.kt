@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/usuarios")
 class UsuarioController(private val usuarioService: UsuarioService) {
 
+    //crea un usuario nuevo; recibe UsuarioRegistrationRequest en el cuerpo
     @PostMapping
     fun registrarUsuario(@RequestBody request: UsuarioRegistrationRequest): ResponseEntity<UsuarioResponse> {
         return try {
@@ -29,7 +30,7 @@ class UsuarioController(private val usuarioService: UsuarioService) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).build()
         }
     }
-
+    //obtener todos los usuarios
     @GetMapping
     fun listarUsuarios(): ResponseEntity<List<UsuarioResponse>> {
         val usuarios = usuarioService.listarUsuarios()
@@ -40,6 +41,7 @@ class UsuarioController(private val usuarioService: UsuarioService) {
         }
     }
 
+    //obtener usuario por id
     @GetMapping("/{id}")
     fun obtenerUsuario(@PathVariable id: Long): ResponseEntity<UsuarioResponse> {
         return try {
@@ -49,7 +51,7 @@ class UsuarioController(private val usuarioService: UsuarioService) {
             ResponseEntity.notFound().build()
         }
     }
-
+    //actualiza los datos de un usuario
     @PutMapping("/{id}")
     fun actualizarUsuario(
         @PathVariable id: Long,
@@ -64,7 +66,7 @@ class UsuarioController(private val usuarioService: UsuarioService) {
             ResponseEntity.badRequest().build()
         }
     }
-
+    //elimina lógicamente al usuario
     @DeleteMapping("/{id}")
     fun eliminarUsuario(@PathVariable id: Long): ResponseEntity<Void> {
         return try {
@@ -74,7 +76,7 @@ class UsuarioController(private val usuarioService: UsuarioService) {
             ResponseEntity.notFound().build()
         }
     }
-
+    // autentica credenciales y devuelve el estado de login
     @PostMapping("/login")
     fun login(@RequestBody request: LoginRequest): ResponseEntity<LoginResponse> {
         val response = usuarioService.login(request)
