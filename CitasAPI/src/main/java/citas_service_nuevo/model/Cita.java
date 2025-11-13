@@ -1,5 +1,6 @@
 package citas_service_nuevo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -85,5 +86,39 @@ public class Cita {
 
     public void setIdConsulta(Long idConsulta) {
         this.idConsulta = idConsulta;
+    }
+
+    @JsonProperty("idUsuario")
+    public Long getIdUsuario() {
+        return usuario != null ? usuario.getId() : null;
+    }
+
+    @JsonProperty("idUsuario")
+    public void setIdUsuario(Long idUsuario) {
+        if (idUsuario == null) {
+            this.usuario = null;
+            return;
+        }
+        if (this.usuario == null) {
+            this.usuario = new Usuario();
+        }
+        this.usuario.setId(idUsuario);
+    }
+
+    @JsonProperty("idDoctor")
+    public Long getIdDoctor() {
+        return doctor != null ? doctor.getId() : null;
+    }
+
+    @JsonProperty("idDoctor")
+    public void setIdDoctor(Long idDoctor) {
+        if (idDoctor == null) {
+            this.doctor = null;
+            return;
+        }
+        if (this.doctor == null) {
+            this.doctor = new Doctor();
+        }
+        this.doctor.setId(idDoctor);
     }
 }

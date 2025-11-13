@@ -35,7 +35,7 @@ public class CitaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cita> getCitaById(@PathVariable Long id) {
+    public ResponseEntity<Cita> getCitaById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(citaService.findById(id));
         } catch (EntityNotFoundException ex) {
@@ -44,7 +44,7 @@ public class CitaController {
     }
 
     @GetMapping("/usuario/{idUsuario}")
-    public ResponseEntity<List<Cita>> getCitasByUsuario(@PathVariable Long idUsuario) {
+    public ResponseEntity<List<Cita>> getCitasByUsuario(@PathVariable("idUsuario") Long idUsuario) {
         List<Cita> citas = citaService.findByUsuario(idUsuario);
         if (citas.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -58,7 +58,7 @@ public class CitaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cita> updateCita(@PathVariable Long id, @RequestBody Cita citaDetails) {
+    public ResponseEntity<Cita> updateCita(@PathVariable("id") Long id, @RequestBody Cita citaDetails) {
         try {
             Cita existente = citaService.findById(id);
             existente.setFechaCita(citaDetails.getFechaCita());
@@ -71,7 +71,7 @@ public class CitaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCita(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCita(@PathVariable("id") Long id) {
         try {
             citaService.deleteById(id);
             return ResponseEntity.noContent().build();
@@ -81,7 +81,7 @@ public class CitaController {
     }
 
     @GetMapping("/usuario/{idUsuario}/proximas")
-    public ResponseEntity<List<Cita>> getProximasCitasByUsuario(@PathVariable Long idUsuario) {
+    public ResponseEntity<List<Cita>> getProximasCitasByUsuario(@PathVariable("idUsuario") Long idUsuario) {
         List<Cita> citas = citaService.findProximasByUsuario(idUsuario);
         if (citas.isEmpty()) {
             return ResponseEntity.noContent().build();

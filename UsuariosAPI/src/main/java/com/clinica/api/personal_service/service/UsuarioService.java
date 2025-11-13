@@ -36,6 +36,7 @@ public class UsuarioService {
     }
 
     public UsuarioResponse findUsuarioById(Long id) {
+        @SuppressWarnings("null")
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         ensureNotAdmin(usuario);
@@ -49,6 +50,7 @@ public class UsuarioService {
     }
 
     public Usuario updateUsuario(Long id, Usuario changes) {
+        @SuppressWarnings("null")
         Usuario existente = usuarioRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         ensureNotAdmin(existente);
@@ -64,6 +66,7 @@ public class UsuarioService {
         return usuarioRepository.save(existente);
     }
 
+    @SuppressWarnings("null")
     public void deleteUsuarioById(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado para eliminar"));
