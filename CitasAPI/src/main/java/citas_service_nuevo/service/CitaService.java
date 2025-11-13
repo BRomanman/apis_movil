@@ -22,6 +22,7 @@ public class CitaService {
         return citaRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public Cita findById(Long id) {
         return citaRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Cita no encontrada"));
@@ -34,6 +35,7 @@ public class CitaService {
         return citaRepository.save(cita);
     }
 
+    @SuppressWarnings("null")
     public void deleteById(Long id) {
         if (!citaRepository.existsById(id)) {
             throw new EntityNotFoundException("Cita no encontrada");

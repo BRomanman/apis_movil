@@ -5,7 +5,11 @@ import com.clinica.api.personal_service.dto.LoginResponse;
 import com.clinica.api.personal_service.service.UsuarioService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -19,8 +23,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginRequest safeRequest = Objects.requireNonNull(request, "Credenciales requeridas");
         try {
-            LoginResponse resp = usuarioService.login(request);
+            LoginResponse resp = usuarioService.login(safeRequest);
             return ResponseEntity.ok(resp);
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(401).build();

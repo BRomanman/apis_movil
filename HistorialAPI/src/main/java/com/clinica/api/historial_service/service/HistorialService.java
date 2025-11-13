@@ -21,6 +21,7 @@ public class HistorialService {
         return historialRepository.findByUsuarioId(usuarioId);
     }
 
+    @SuppressWarnings("null")
     public Historial findHistorialById(Long id) {
         return historialRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Historial no encontrado"));

@@ -6,10 +6,18 @@ import com.clinica.api.personal_service.model.Usuario;
 import com.clinica.api.personal_service.service.PersonalService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/doctores")
@@ -27,12 +35,14 @@ public class DoctorController {
         if (doctores.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        List<DoctorResponse> response = doctores.stream().map(this::mapToResponse).collect(Collectors.toList());
+        List<DoctorResponse> response = doctores.stream()
+            .map(this::mapToResponse)
+            .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DoctorResponse> getDoctorById(@PathVariable Long id) {
+    public ResponseEntity<DoctorResponse> getDoctorById(@PathVariable("id") Long id) {
         try {
             Doctor doctor = personalService.findDoctorById(id);
             return ResponseEntity.ok(mapToResponse(doctor));
@@ -43,18 +53,22 @@ public class DoctorController {
 
     @PostMapping
     public ResponseEntity<DoctorResponse> createDoctor(@RequestBody Doctor doctor) {
-        Doctor nuevoDoctor = personalService.saveDoctor(doctor);
+        Doctor nuevoDoctor = personalService.saveDoctor(requireDoctorPayload(doctor));
         return ResponseEntity.status(HttpStatus.CREATED).body(mapToResponse(nuevoDoctor));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DoctorResponse> updateDoctor(@PathVariable Long id, @RequestBody Doctor doctorDetails) {
+    public ResponseEntity<DoctorResponse> updateDoctor(
+        @PathVariable("id") Long id,
+        @RequestBody Doctor doctorDetails
+    ) {
         try {
             Doctor existente = personalService.findDoctorById(id);
-            existente.setTarifaConsulta(doctorDetails.getTarifaConsulta());
-            existente.setSueldo(doctorDetails.getSueldo());
-            existente.setBono(doctorDetails.getBono());
-            existente.setUsuario(doctorDetails.getUsuario());
+            Doctor safeDetails = requireDoctorPayload(doctorDetails);
+            existente.setTarifaConsulta(safeDetails.getTarifaConsulta());
+            existente.setSueldo(safeDetails.getSueldo());
+            existente.setBono(safeDetails.getBono());
+            existente.setUsuario(safeDetails.getUsuario());
             Doctor actualizado = personalService.saveDoctor(existente);
             return ResponseEntity.ok(mapToResponse(actualizado));
         } catch (EntityNotFoundException ex) {
@@ -63,7 +77,7 @@ public class DoctorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDoctor(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteDoctor(@PathVariable("id") Long id) {
         try {
             personalService.deleteDoctorById(id);
             return ResponseEntity.noContent().build();
@@ -72,13 +86,14 @@ public class DoctorController {
         }
     }
 
-    private DoctorResponse mapToResponse(Doctor d) {
+    private DoctorResponse mapToResponse(Doctor doctorInput) {
+        Doctor doctor = Objects.requireNonNull(doctorInput, "Doctor entity must not be null");
         DoctorResponse r = new DoctorResponse();
-        r.setId(d.getId());
-        r.setTarifaConsulta(d.getTarifaConsulta());
-        r.setSueldo(d.getSueldo());
-        r.setBono(d.getBono());
-        Usuario u = d.getUsuario();
+        r.setId(doctor.getId());
+        r.setTarifaConsulta(doctor.getTarifaConsulta());
+        r.setSueldo(doctor.getSueldo());
+        r.setBono(doctor.getBono());
+        Usuario u = doctor.getUsuario();
         if (u != null) {
             DoctorResponse.UsuarioInfo ui = new DoctorResponse.UsuarioInfo();
             ui.setId(u.getId());
@@ -92,5 +107,8 @@ public class DoctorController {
         }
         return r;
     }
-}
 
+    private Doctor requireDoctorPayload(Doctor doctor) {
+        return Objects.requireNonNull(doctor, "Doctor payload must not be null");
+    }
+}

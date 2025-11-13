@@ -20,11 +20,21 @@ public class Doctor {
     @Column
     private Long bono;
 
+    @Column(nullable = false)
+    private Boolean activo = true;
+
     @OneToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
     public Doctor() {
+    }
+
+    @PrePersist
+    void ensureDefaults() {
+        if (activo == null) {
+            activo = true;
+        }
     }
 
     public Long getId() {
@@ -65,5 +75,13 @@ public class Doctor {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }

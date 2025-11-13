@@ -56,6 +56,7 @@ public class SeguroService {
         return toResponse(findSeguro(id));
     }
 
+    @SuppressWarnings("null")
     public SeguroResponse actualizarSeguro(Long id, SeguroUpdateRequest request) {
         Seguro seguro = findSeguro(id);
 
@@ -101,16 +102,19 @@ public class SeguroService {
         return toResponse(seguroRepository.save(seguro));
     }
 
+    @SuppressWarnings("null")
     public void eliminarSeguro(Long id) {
         Seguro seguro = findSeguro(id);
         seguroRepository.delete(seguro);
     }
 
+    @SuppressWarnings("null")
     private Seguro findSeguro(Long id) {
         return seguroRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Seguro con id " + id + " no encontrado"));
     }
 
+    @SuppressWarnings("null")
     private Usuario findUsuario(Long usuarioId) {
         return usuarioRepository.findById(usuarioId)
             .orElseThrow(() -> new EntityNotFoundException("Usuario con id " + usuarioId + " no encontrado"));

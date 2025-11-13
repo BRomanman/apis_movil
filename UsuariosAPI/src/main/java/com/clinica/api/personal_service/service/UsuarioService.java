@@ -9,6 +9,7 @@ import com.clinica.api.personal_service.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 public class UsuarioService {
+
+    private static final String ADMIN_ROLE_NAME = "administrador";
 
     private final UsuarioRepository usuarioRepository;
     private final DoctorRepository doctorRepository;
@@ -27,6 +30,7 @@ public class UsuarioService {
 
     public List<UsuarioResponse> findAllUsuarios() {
         return usuarioRepository.findAll().stream()
+            .filter(this::isAllowedUsuario)
             .map(this::mapToResponse)
             .collect(Collectors.toList());
     }
@@ -34,41 +38,47 @@ public class UsuarioService {
     public UsuarioResponse findUsuarioById(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+        ensureNotAdmin(usuario);
         return mapToResponse(usuario);
     }
 
     public Usuario saveUsuario(Usuario usuario) {
-        return usuarioRepository.save(usuario);
+        Usuario safeUsuario = Objects.requireNonNull(usuario, "Usuario entity must not be null");
+        ensurePayloadNotAdmin(safeUsuario);
+        return usuarioRepository.save(safeUsuario);
     }
 
     public Usuario updateUsuario(Long id, Usuario changes) {
         Usuario existente = usuarioRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
-        existente.setNombre(changes.getNombre());
-        existente.setApellido(changes.getApellido());
-        existente.setCorreo(changes.getCorreo());
-        existente.setTelefono(changes.getTelefono());
-        existente.setFechaNacimiento(changes.getFechaNacimiento());
-        existente.setContrasena(changes.getContrasena());
-        existente.setRol(changes.getRol());
+        ensureNotAdmin(existente);
+        Usuario safeChanges = Objects.requireNonNull(changes, "Usuario updates must not be null");
+        ensurePayloadNotAdmin(safeChanges);
+        existente.setNombre(safeChanges.getNombre());
+        existente.setApellido(safeChanges.getApellido());
+        existente.setCorreo(safeChanges.getCorreo());
+        existente.setTelefono(safeChanges.getTelefono());
+        existente.setFechaNacimiento(safeChanges.getFechaNacimiento());
+        existente.setContrasena(safeChanges.getContrasena());
+        existente.setRol(safeChanges.getRol());
         return usuarioRepository.save(existente);
     }
 
     public void deleteUsuarioById(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new EntityNotFoundException("Usuario no encontrado para eliminar");
-        }
-        usuarioRepository.deleteById(id);
+        Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado para eliminar"));
+        ensureNotAdmin(usuario);
+        usuarioRepository.delete(usuario);
     }
 
     public LoginResponse login(LoginRequest request) {
-        Optional<Usuario> opt = usuarioRepository.findByCorreo(request.getCorreo());
+        LoginRequest safeRequest = Objects.requireNonNull(request, "Credenciales requeridas");
+        Optional<Usuario> opt = usuarioRepository.findByCorreo(safeRequest.getCorreo());
         if (opt.isEmpty()) {
             throw new EntityNotFoundException("Correo o contraseña incorrectos");
         }
         Usuario usuario = opt.get();
-        if (usuario.getContrasena() == null || !usuario.getContrasena().equals(request.getContrasena())) {
-            // En un entorno real usar hashing (BCrypt)
+        if (usuario.getContrasena() == null || !usuario.getContrasena().equals(safeRequest.getContrasena())) {
             throw new EntityNotFoundException("Correo o contraseña incorrectos");
         }
         LoginResponse resp = new LoginResponse();
@@ -78,13 +88,14 @@ public class UsuarioService {
         resp.setApellido(usuario.getApellido());
         resp.setCorreo(usuario.getCorreo());
 
-        doctorRepository.findByUsuario_Id(usuario.getId())
+        doctorRepository.findByUsuario_IdAndActivoTrue(usuario.getId())
             .ifPresent(d -> resp.setDoctorId(d.getId()));
 
         return resp;
     }
 
-    private UsuarioResponse mapToResponse(Usuario usuario) {
+    private UsuarioResponse mapToResponse(Usuario usuarioInput) {
+        Usuario usuario = Objects.requireNonNull(usuarioInput, "Usuario entity must not be null");
         UsuarioResponse r = new UsuarioResponse();
         r.setId(usuario.getId());
         r.setNombre(usuario.getNombre());
@@ -94,7 +105,7 @@ public class UsuarioService {
         r.setTelefono(usuario.getTelefono());
         r.setRol(usuario.getRol() != null ? usuario.getRol().getNombre() : null);
 
-        doctorRepository.findByUsuario_Id(usuario.getId()).ifPresent(doc -> {
+        doctorRepository.findByUsuario_IdAndActivoTrue(usuario.getId()).ifPresent(doc -> {
             UsuarioResponse.DoctorInfo info = new UsuarioResponse.DoctorInfo();
             info.setId(doc.getId());
             info.setTarifaConsulta(doc.getTarifaConsulta());
@@ -105,5 +116,26 @@ public class UsuarioService {
 
         return r;
     }
-}
 
+    private void ensureNotAdmin(Usuario usuario) {
+        if (isAdmin(usuario)) {
+            throw new EntityNotFoundException("Usuario no encontrado");
+        }
+    }
+
+    private void ensurePayloadNotAdmin(Usuario usuario) {
+        if (isAdmin(usuario)) {
+            throw new IllegalArgumentException("No se permiten operaciones sobre administradores");
+        }
+    }
+
+    private boolean isAllowedUsuario(Usuario usuario) {
+        return usuario != null && !isAdmin(usuario);
+    }
+
+    private boolean isAdmin(Usuario usuario) {
+        return usuario != null
+            && usuario.getRol() != null
+            && ADMIN_ROLE_NAME.equalsIgnoreCase(usuario.getRol().getNombre());
+    }
+}

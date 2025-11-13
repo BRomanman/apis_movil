@@ -5,6 +5,7 @@ import com.clinica.api.personal_service.repository.DoctorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,22 +19,25 @@ public class PersonalService {
     }
 
     public List<Doctor> findAllDoctores() {
-        return doctorRepository.findAll();
+        return doctorRepository.findByActivoTrue();
     }
 
     public Doctor findDoctorById(Long id) {
-        return doctorRepository.findById(id)
+        return doctorRepository.findByIdAndActivoTrue(id)
             .orElseThrow(() -> new EntityNotFoundException("Doctor no encontrado"));
     }
 
     public Doctor saveDoctor(Doctor doctor) {
-        return doctorRepository.save(doctor);
+        Doctor safeDoctor = Objects.requireNonNull(doctor, "Doctor entity must not be null");
+        if (safeDoctor.getActivo() == null) {
+            safeDoctor.setActivo(true);
+        }
+        return doctorRepository.save(safeDoctor);
     }
 
     public void deleteDoctorById(Long id) {
-        if (!doctorRepository.existsById(id)) {
-            throw new EntityNotFoundException("Doctor no encontrado para eliminar");
-        }
-        doctorRepository.deleteById(id);
+        Doctor doctor = findDoctorById(id);
+        doctor.setActivo(false);
+        doctorRepository.save(doctor);
     }
 }
