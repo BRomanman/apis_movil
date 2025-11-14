@@ -21,7 +21,7 @@ public class HistorialController {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Historial>> getHistorialesByUsuarioId(@PathVariable Long usuarioId) {
+    public ResponseEntity<List<Historial>> getHistorialesByUsuarioId(@PathVariable("usuarioId") Long usuarioId) {
         List<Historial> historiales = historialService.findHistorialesByUsuarioId(usuarioId);
         if (historiales.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -30,7 +30,7 @@ public class HistorialController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Historial> getHistorialById(@PathVariable Long id) {
+    public ResponseEntity<Historial> getHistorialById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(historialService.findHistorialById(id));
         } catch (EntityNotFoundException ex) {
