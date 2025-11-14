@@ -44,7 +44,7 @@ public class SeguroController {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<SeguroResponse>> listarPorUsuario(@PathVariable Long usuarioId) {
+    public ResponseEntity<List<SeguroResponse>> listarPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
         List<SeguroResponse> seguros = seguroService.listarSegurosPorUsuario(usuarioId);
         if (seguros.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -53,13 +53,13 @@ public class SeguroController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SeguroResponse> obtenerSeguro(@PathVariable Long id) {
+    public ResponseEntity<SeguroResponse> obtenerSeguro(@PathVariable("id") Long id) {
         return ResponseEntity.ok(seguroService.obtenerSeguro(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<SeguroResponse> actualizarSeguro(
-        @PathVariable Long id,
+        @PathVariable("id") Long id,
         @Valid @RequestBody SeguroUpdateRequest request
     ) {
         return ResponseEntity.ok(seguroService.actualizarSeguro(id, request));
@@ -67,14 +67,14 @@ public class SeguroController {
 
     @PatchMapping("/{id}/cancelacion")
     public ResponseEntity<SeguroResponse> cancelarSeguro(
-        @PathVariable Long id,
+        @PathVariable("id") Long id,
         @Valid @RequestBody(required = false) SeguroCancelRequest request
     ) {
         return ResponseEntity.ok(seguroService.cancelarSeguro(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarSeguro(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarSeguro(@PathVariable("id") Long id) {
         seguroService.eliminarSeguro(id);
         return ResponseEntity.noContent().build();
     }
