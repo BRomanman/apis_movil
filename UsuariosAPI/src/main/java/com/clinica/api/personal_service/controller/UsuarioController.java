@@ -3,6 +3,8 @@ package com.clinica.api.personal_service.controller;
 import com.clinica.api.personal_service.dto.UsuarioResponse;
 import com.clinica.api.personal_service.model.Usuario;
 import com.clinica.api.personal_service.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
+@Tag(name = "Usuarios")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -28,6 +31,7 @@ public class UsuarioController {
     }
 
     @GetMapping
+    @Operation(summary = "Lista los usuarios no administradores.")
     public ResponseEntity<List<UsuarioResponse>> getAllUsuarios() {
         List<UsuarioResponse> usuarios = usuarioService.findAllUsuarios();
         if (usuarios.isEmpty()) {
@@ -37,6 +41,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtiene un usuario por su identificador.")
     public ResponseEntity<UsuarioResponse> getUsuarioById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(usuarioService.findUsuarioById(id));
@@ -46,6 +51,7 @@ public class UsuarioController {
     }
 
     @PostMapping
+    @Operation(summary = "Crea un nuevo usuario.")
     public ResponseEntity<UsuarioResponse> createUsuario(@RequestBody Usuario usuario) {
         Usuario safeUsuario = requireUsuarioPayload(usuario);
         Usuario saved = usuarioService.saveUsuario(safeUsuario);
@@ -53,6 +59,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualiza un usuario existente.")
     public ResponseEntity<UsuarioResponse> updateUsuario(
         @PathVariable("id") Long id,
         @RequestBody Usuario usuarioDetails
@@ -67,6 +74,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Elimina un usuario no administrador.")
     public ResponseEntity<Void> deleteUsuario(@PathVariable("id") Long id) {
         try {
             usuarioService.deleteUsuarioById(id);

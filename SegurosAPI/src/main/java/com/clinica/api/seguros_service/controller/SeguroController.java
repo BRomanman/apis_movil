@@ -1,12 +1,12 @@
 package com.clinica.api.seguros_service.controller;
 
-import com.clinica.api.seguros_service.dto.SeguroCancelRequest;
-import com.clinica.api.seguros_service.dto.SeguroRequest;
-import com.clinica.api.seguros_service.dto.SeguroResponse;
-import com.clinica.api.seguros_service.dto.SeguroUpdateRequest;
+import com.clinica.api.seguros_service.model.Seguro;
 import com.clinica.api.seguros_service.service.SeguroService;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/seguros")
+@Tag(name = "Seguros")
 public class SeguroController {
 
     private final SeguroService seguroService;
@@ -29,14 +30,10 @@ public class SeguroController {
         this.seguroService = seguroService;
     }
 
-    @PostMapping
-    public ResponseEntity<SeguroResponse> tomarSeguro(@Valid @RequestBody SeguroRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(seguroService.tomarSeguro(request));
-    }
-
     @GetMapping
-    public ResponseEntity<List<SeguroResponse>> listarSeguros() {
-        List<SeguroResponse> seguros = seguroService.listarSeguros();
+    @Operation(summary = "Lista todos los seguros disponibles.")
+    public ResponseEntity<List<Seguro>> listarSeguros() {
+        List<Seguro> seguros = seguroService.findAll();
         if (seguros.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -44,8 +41,9 @@ public class SeguroController {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<SeguroResponse>> listarPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
-        List<SeguroResponse> seguros = seguroService.listarSegurosPorUsuario(usuarioId);
+    @Operation(summary = "Lista los seguros contratados por un usuario.")
+    public ResponseEntity<List<Seguro>> listarPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
+        List<Seguro> seguros = seguroService.findByUsuario(usuarioId);
         if (seguros.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -53,29 +51,56 @@ public class SeguroController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SeguroResponse> obtenerSeguro(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(seguroService.obtenerSeguro(id));
+    @Operation(summary = "Obtiene los detalles de un seguro por su ID.")
+    public ResponseEntity<Seguro> obtenerSeguro(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(seguroService.findById(id));
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping
+    @Operation(summary = "Crea un nuevo seguro para un usuario.")
+    public ResponseEntity<Seguro> crearSeguro(@RequestBody Seguro seguro) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(seguroService.create(seguro));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SeguroResponse> actualizarSeguro(
+    @Operation(summary = "Actualiza la información del seguro.")
+    public ResponseEntity<Seguro> actualizarSeguro(
         @PathVariable("id") Long id,
-        @Valid @RequestBody SeguroUpdateRequest request
+        @RequestBody Seguro seguro
     ) {
-        return ResponseEntity.ok(seguroService.actualizarSeguro(id, request));
+        try {
+            return ResponseEntity.ok(seguroService.update(id, seguro));
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PatchMapping("/{id}/cancelacion")
-    public ResponseEntity<SeguroResponse> cancelarSeguro(
+    @Operation(summary = "Cancela un seguro activo.")
+    public ResponseEntity<Seguro> cancelarSeguro(
         @PathVariable("id") Long id,
-        @Valid @RequestBody(required = false) SeguroCancelRequest request
+        @RequestBody(required = false) Map<String, String> body
     ) {
-        return ResponseEntity.ok(seguroService.cancelarSeguro(id, request));
+        String motivo = body != null ? body.get("motivo") : null;
+        try {
+            return ResponseEntity.ok(seguroService.cancel(id, motivo));
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Elimina el registro de un seguro.")
     public ResponseEntity<Void> eliminarSeguro(@PathVariable("id") Long id) {
-        seguroService.eliminarSeguro(id);
-        return ResponseEntity.noContent().build();
+        try {
+            seguroService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

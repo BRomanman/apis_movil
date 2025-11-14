@@ -39,6 +39,16 @@
             "projectName": "seguros-service-SegurosAPI",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-CitasServiceNuevoApplication<citas-service-CitasAPI>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "citas_service_nuevo.CitasServiceNuevoApplication",
+            "projectName": "citas-service-CitasAPI",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

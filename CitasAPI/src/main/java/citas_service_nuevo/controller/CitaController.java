@@ -2,6 +2,8 @@ package citas_service_nuevo.controller;
 
 import citas_service_nuevo.model.Cita;
 import citas_service_nuevo.service.CitaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/citas")
+@Tag(name = "Citas")
 public class CitaController {
 
     private final CitaService citaService;
@@ -26,6 +29,7 @@ public class CitaController {
     }
 
     @GetMapping
+    @Operation(summary = "Obtiene todas las citas registradas.")
     public ResponseEntity<List<Cita>> getAllCitas() {
         List<Cita> citas = citaService.findAll();
         if (citas.isEmpty()) {
@@ -35,6 +39,7 @@ public class CitaController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtiene una cita por su identificador.")
     public ResponseEntity<Cita> getCitaById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(citaService.findById(id));
@@ -44,6 +49,7 @@ public class CitaController {
     }
 
     @GetMapping("/usuario/{idUsuario}")
+    @Operation(summary = "Lista las citas asociadas a un usuario.")
     public ResponseEntity<List<Cita>> getCitasByUsuario(@PathVariable("idUsuario") Long idUsuario) {
         List<Cita> citas = citaService.findByUsuario(idUsuario);
         if (citas.isEmpty()) {
@@ -53,11 +59,13 @@ public class CitaController {
     }
 
     @PostMapping
+    @Operation(summary = "Crea una nueva cita.")
     public ResponseEntity<Cita> createCita(@RequestBody Cita cita) {
         return ResponseEntity.status(HttpStatus.CREATED).body(citaService.save(cita));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualiza los datos principales de una cita.")
     public ResponseEntity<Cita> updateCita(@PathVariable("id") Long id, @RequestBody Cita citaDetails) {
         try {
             Cita existente = citaService.findById(id);
@@ -71,6 +79,7 @@ public class CitaController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Elimina una cita existente.")
     public ResponseEntity<Void> deleteCita(@PathVariable("id") Long id) {
         try {
             citaService.deleteById(id);
@@ -81,6 +90,7 @@ public class CitaController {
     }
 
     @GetMapping("/usuario/{idUsuario}/proximas")
+    @Operation(summary = "Recupera las próximas citas a partir de la fecha actual.")
     public ResponseEntity<List<Cita>> getProximasCitasByUsuario(@PathVariable("idUsuario") Long idUsuario) {
         List<Cita> citas = citaService.findProximasByUsuario(idUsuario);
         if (citas.isEmpty()) {

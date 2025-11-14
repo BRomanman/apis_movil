@@ -4,12 +4,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -33,26 +30,31 @@ public class Seguro {
     @Column(nullable = false, length = 20)
     private SeguroEstado estado = SeguroEstado.ACTIVO;
 
+    @Column(name = "id_usuario", nullable = false)
+    private Long usuarioId;
+
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
     @Column(name = "fecha_cancelacion")
     private LocalDateTime fechaCancelacion;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_usuario", nullable = false)
-    private Usuario usuario;
-
     @PrePersist
     void onCreate() {
-        this.fechaCreacion = LocalDateTime.now();
-        if (this.estado == null) {
-            this.estado = SeguroEstado.ACTIVO;
+        if (fechaCreacion == null) {
+            fechaCreacion = LocalDateTime.now();
+        }
+        if (estado == null) {
+            estado = SeguroEstado.ACTIVO;
         }
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNombreSeguro() {
@@ -79,6 +81,14 @@ public class Seguro {
         this.estado = estado;
     }
 
+    public Long getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(Long usuarioId) {
+        this.usuarioId = usuarioId;
+    }
+
     public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
     }
@@ -89,13 +99,5 @@ public class Seguro {
 
     public void setFechaCancelacion(LocalDateTime fechaCancelacion) {
         this.fechaCancelacion = fechaCancelacion;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
     }
 }

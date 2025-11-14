@@ -4,6 +4,8 @@ import com.clinica.api.personal_service.dto.DoctorResponse;
 import com.clinica.api.personal_service.model.Doctor;
 import com.clinica.api.personal_service.model.Usuario;
 import com.clinica.api.personal_service.service.PersonalService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/doctores")
+@Tag(name = "Doctores")
 public class DoctorController {
 
     private final PersonalService personalService;
@@ -30,6 +33,7 @@ public class DoctorController {
     }
 
     @GetMapping
+    @Operation(summary = "Lista los doctores activos.")
     public ResponseEntity<List<DoctorResponse>> getAllDoctores() {
         List<Doctor> doctores = personalService.findAllDoctores();
         if (doctores.isEmpty()) {
@@ -42,6 +46,7 @@ public class DoctorController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtiene la información del doctor por su ID.")
     public ResponseEntity<DoctorResponse> getDoctorById(@PathVariable("id") Long id) {
         try {
             Doctor doctor = personalService.findDoctorById(id);
@@ -52,12 +57,14 @@ public class DoctorController {
     }
 
     @PostMapping
+    @Operation(summary = "Crea un nuevo doctor.")
     public ResponseEntity<DoctorResponse> createDoctor(@RequestBody Doctor doctor) {
         Doctor nuevoDoctor = personalService.saveDoctor(requireDoctorPayload(doctor));
         return ResponseEntity.status(HttpStatus.CREATED).body(mapToResponse(nuevoDoctor));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualiza los datos económicos del doctor.")
     public ResponseEntity<DoctorResponse> updateDoctor(
         @PathVariable("id") Long id,
         @RequestBody Doctor doctorDetails
@@ -77,6 +84,7 @@ public class DoctorController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Marca como inactivo a un doctor.")
     public ResponseEntity<Void> deleteDoctor(@PathVariable("id") Long id) {
         try {
             personalService.deleteDoctorById(id);
