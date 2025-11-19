@@ -8,6 +8,9 @@ public class DoctorResponse {
     private Long sueldo;
     private Long bono;
     private UsuarioInfo usuario;
+    
+    // [CORRECTO] El campo va aquí, en la raíz de la respuesta
+    private String especialidad; 
 
     public static class UsuarioInfo {
         private Long id;
@@ -17,6 +20,8 @@ public class DoctorResponse {
         private String correo;
         private String telefono;
         private String rol;
+
+        // [CORRECCIÓN] Quitamos 'especialidad' de aquí, no pertenece a los datos personales
 
         public Long getId() { return id; }
         public void setId(Long id) { this.id = id; }
@@ -44,5 +49,8 @@ public class DoctorResponse {
     public void setBono(Long bono) { this.bono = bono; }
     public UsuarioInfo getUsuario() { return usuario; }
     public void setUsuario(UsuarioInfo usuario) { this.usuario = usuario; }
-}
 
+    // [CORRECCIÓN] ¡Faltaban estos! Sin esto, el controlador falla.
+    public String getEspecialidad() { return especialidad; }
+    public void setEspecialidad(String especialidad) { this.especialidad = especialidad; }
+}

@@ -4,6 +4,8 @@ import com.clinica.api.personal_service.dto.DoctorResponse;
 import com.clinica.api.personal_service.model.Doctor;
 import com.clinica.api.personal_service.model.Usuario;
 import com.clinica.api.personal_service.service.PersonalService;
+import com.clinica.api.personal_service.repository.EspecialidadRepository; // [IMPORTANTE] Importamos el repo
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,9 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class DoctorController {
 
     private final PersonalService personalService;
+    private final EspecialidadRepository especialidadRepository; // [NUEVO] Inyección del repositorio
 
-    public DoctorController(PersonalService personalService) {
+    // [ACTUALIZADO] Constructor con ambos servicios
+    public DoctorController(PersonalService personalService, EspecialidadRepository especialidadRepository) {
         this.personalService = personalService;
+        this.especialidadRepository = especialidadRepository;
     }
 
     @GetMapping
@@ -103,6 +108,17 @@ public class DoctorController {
         r.setTarifaConsulta(doctor.getTarifaConsulta());
         r.setSueldo(doctor.getSueldo());
         r.setBono(doctor.getBono());
+
+        // --- LÓGICA BLINDADA ---
+        // Buscamos todas las especialidades
+        List<com.clinica.api.personal_service.model.Especialidad> especialidades = especialidadRepository.findByDoctor(doctor);
+        
+        // Si hay al menos una, tomamos la primera. Si no, se queda null.
+        if (!especialidades.isEmpty()) {
+            r.setEspecialidad(especialidades.get(0).getNombre());
+        }
+        // -----------------------
+
         Usuario u = doctor.getUsuario();
         if (u != null) {
             DoctorResponse.UsuarioInfo ui = new DoctorResponse.UsuarioInfo();
