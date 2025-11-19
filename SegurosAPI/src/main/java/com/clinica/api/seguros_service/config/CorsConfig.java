@@ -13,9 +13,9 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Permite todas las rutas
-                        .allowedOrigins("http://localhost:5173", "http://127.0.0.1:5173") // Desbloquea tu React
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS") // Permite todos los verbos
+                registry.addMapping("/**") // Permite todas las rutas de Seguros
+                        .allowedOrigins("http://localhost:5173", "http://127.0.0.1:5173") // Desbloquea React
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
