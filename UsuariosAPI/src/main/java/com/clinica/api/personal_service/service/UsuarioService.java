@@ -53,16 +53,28 @@ public class UsuarioService {
         @SuppressWarnings("null")
         Usuario existente = usuarioRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+        
         ensureNotAdmin(existente);
         Usuario safeChanges = Objects.requireNonNull(changes, "Usuario updates must not be null");
         ensurePayloadNotAdmin(safeChanges);
-        existente.setNombre(safeChanges.getNombre());
-        existente.setApellido(safeChanges.getApellido());
-        existente.setCorreo(safeChanges.getCorreo());
-        existente.setTelefono(safeChanges.getTelefono());
-        existente.setFechaNacimiento(safeChanges.getFechaNacimiento());
-        existente.setContrasena(safeChanges.getContrasena());
-        existente.setRol(safeChanges.getRol());
+
+        // --- ACTUALIZACIÓN SEGURA ---
+        // Solo actualizamos si el dato no es null.
+        // Así evitamos borrar cosas por accidente.
+        
+        if (safeChanges.getNombre() != null) existente.setNombre(safeChanges.getNombre());
+        if (safeChanges.getApellido() != null) existente.setApellido(safeChanges.getApellido());
+        if (safeChanges.getCorreo() != null) existente.setCorreo(safeChanges.getCorreo());
+        if (safeChanges.getTelefono() != null) existente.setTelefono(safeChanges.getTelefono());
+        if (safeChanges.getFechaNacimiento() != null) existente.setFechaNacimiento(safeChanges.getFechaNacimiento());
+        
+        // CRÍTICO: Solo cambiamos la contraseña si viene una nueva
+        if (safeChanges.getContrasena() != null && !safeChanges.getContrasena().isEmpty()) {
+            existente.setContrasena(safeChanges.getContrasena());
+        }
+        
+        if (safeChanges.getRol() != null) existente.setRol(safeChanges.getRol());
+
         return usuarioRepository.save(existente);
     }
 
