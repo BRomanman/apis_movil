@@ -37,12 +37,12 @@ class HistorialServiceTest {
         historial.setFechaConsulta(LocalDate.of(2024, 1, 15));
 
         List<Historial> expected = List.of(historial);
-        when(historialRepository.findByUsuarioId(5L)).thenReturn(expected);
+        when(historialRepository.findByIdUsuario(5L)).thenReturn(expected);
 
         List<Historial> result = historialService.findHistorialesByUsuarioId(5L);
 
         assertThat(result).containsExactlyElementsOf(expected);
-        verify(historialRepository).findByUsuarioId(5L);
+        verify(historialRepository).findByIdUsuario(5L);
     }
 
     @Test
