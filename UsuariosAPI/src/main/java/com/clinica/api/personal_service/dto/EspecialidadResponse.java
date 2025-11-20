@@ -1,5 +1,8 @@
 package com.clinica.api.personal_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EspecialidadResponse {
     private Long id;
     private String nombre;
