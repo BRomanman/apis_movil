@@ -91,10 +91,10 @@ public class CitaController {
         }
     }
 
-    @GetMapping("/usuario/{idUsuario}/proximas")
-    @Operation(summary = "Recupera las próximas citas a partir de la fecha actual.")
-    public ResponseEntity<List<Cita>> getProximasCitasByUsuario(@PathVariable("idUsuario") Long idUsuario) {
-        List<Cita> citas = citaService.findProximasByUsuario(idUsuario);
+    @GetMapping("/doctor/{idDoctor}")
+    @Operation(summary = "Lista las citas agendadas para un doctor específico.")
+    public ResponseEntity<List<Cita>> getCitasByDoctor(@PathVariable("idDoctor") Long idDoctor) {
+        List<Cita> citas = citaService.findByDoctor(idDoctor);
         if (citas.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

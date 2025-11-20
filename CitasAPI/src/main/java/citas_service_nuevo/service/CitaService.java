@@ -47,7 +47,8 @@ public class CitaService {
         return citaRepository.findByUsuarioId(idUsuario);
     }
 
-    public List<Cita> findProximasByUsuario(Long idUsuario) {
-        return citaRepository.findByUsuarioIdAndFechaCitaAfter(idUsuario, LocalDateTime.now());
+    // [NUEVO] Servicio para buscar por doctor
+    public List<Cita> findByDoctor(Long idDoctor) {
+        return citaRepository.findByDoctorId(idDoctor);
     }
 }
