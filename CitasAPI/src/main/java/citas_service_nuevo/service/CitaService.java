@@ -4,6 +4,7 @@ import citas_service_nuevo.model.Cita;
 import citas_service_nuevo.repository.CitaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -44,5 +45,11 @@ public class CitaService {
 
     public List<Cita> findProximasByUsuario(Long idUsuario) {
         return citaRepository.findByIdUsuarioAndFechaCitaAfter(idUsuario, LocalDateTime.now());
+    }
+
+    public List<Cita> findByDoctorAndFecha(Long idDoctor, LocalDate fecha) {
+        LocalDateTime inicioDelDia = fecha.atStartOfDay();
+        LocalDateTime finDelDia = fecha.plusDays(1).atStartOfDay();
+        return citaRepository.findByIdDoctorAndFechaCitaBetweenOrderByHoraInicio(idDoctor, inicioDelDia, finDelDia);
     }
 }

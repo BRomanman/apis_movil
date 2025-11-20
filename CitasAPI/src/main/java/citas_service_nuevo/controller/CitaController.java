@@ -5,6 +5,8 @@ import citas_service_nuevo.service.CitaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -98,5 +100,23 @@ public class CitaController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(citas);
+    }
+
+    @GetMapping("/doctor/{idDoctor}/fecha/{fecha}")
+    @Operation(summary = "Lista las citas de un doctor en una fecha específica (formato yyyy-MM-dd).")
+    public ResponseEntity<List<Cita>> getCitasPorDoctorYFecha(
+        @PathVariable("idDoctor") Long idDoctor,
+        @PathVariable("fecha") String fecha
+    ) {
+        try {
+            LocalDate fechaBusqueda = LocalDate.parse(fecha);
+            List<Cita> citas = citaService.findByDoctorAndFecha(idDoctor, fechaBusqueda);
+            if (citas.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(citas);
+        } catch (DateTimeParseException ex) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
