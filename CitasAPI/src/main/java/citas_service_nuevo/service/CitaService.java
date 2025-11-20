@@ -52,4 +52,8 @@ public class CitaService {
         LocalDateTime finDelDia = fecha.plusDays(1).atStartOfDay();
         return citaRepository.findByIdDoctorAndFechaCitaBetweenOrderByHoraInicio(idDoctor, inicioDelDia, finDelDia);
     }
+
+    public boolean isDisponible(Long id) {
+        return findById(id).getDisponible();
+    }
 }

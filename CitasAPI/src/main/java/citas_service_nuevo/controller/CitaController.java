@@ -119,4 +119,14 @@ public class CitaController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/{id}/disponible")
+    @Operation(summary = "Indica si una cita está disponible.")
+    public ResponseEntity<Boolean> isCitaDisponible(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(citaService.isDisponible(id));
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
