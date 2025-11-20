@@ -9,7 +9,6 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,20 +71,20 @@ public class CitaController {
         try {
             Cita existente = citaService.findById(id);
             existente.setFechaCita(citaDetails.getFechaCita());
-            existente.setDoctor(citaDetails.getDoctor());
+            existente.setEstado(citaDetails.getEstado());
+            existente.setIdUsuario(citaDetails.getIdUsuario());
+            existente.setIdDoctor(citaDetails.getIdDoctor());
+            existente.setPago(citaDetails.getPago());
+            existente.setIdReceta(citaDetails.getIdReceta());
+            existente.setIdResena(citaDetails.getIdResena());
+            existente.setIdResumen(citaDetails.getIdResumen());
             existente.setIdConsulta(citaDetails.getIdConsulta());
+            existente.setHoraInicio(citaDetails.getHoraInicio());
+            existente.setHoraFin(citaDetails.getHoraFin());
+            existente.setDuracionMinutos(citaDetails.getDuracionMinutos());
+            existente.setDisponible(citaDetails.getDisponible());
+            existente.setObservacionesHorario(citaDetails.getObservacionesHorario());
             return ResponseEntity.ok(citaService.save(existente));
-        } catch (EntityNotFoundException ex) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Elimina una cita existente.")
-    public ResponseEntity<Void> deleteCita(@PathVariable("id") Long id) {
-        try {
-            citaService.deleteById(id);
-            return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.notFound().build();
         }

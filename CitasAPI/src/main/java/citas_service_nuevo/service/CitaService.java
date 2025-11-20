@@ -29,25 +29,20 @@ public class CitaService {
     }
 
     public Cita save(Cita cita) {
-        if (cita.getId() == null) {
-            cita.setEstado("CONFIRMADA");
+        if (cita.getEstado() == null) {
+            cita.setEstado("Disponible");
+        }
+        if (cita.getDisponible() == null) {
+            cita.setDisponible(Boolean.TRUE);
         }
         return citaRepository.save(cita);
     }
 
-    @SuppressWarnings("null")
-    public void deleteById(Long id) {
-        if (!citaRepository.existsById(id)) {
-            throw new EntityNotFoundException("Cita no encontrada");
-        }
-        citaRepository.deleteById(id);
-    }
-
     public List<Cita> findByUsuario(Long idUsuario) {
-        return citaRepository.findByUsuarioId(idUsuario);
+        return citaRepository.findByIdUsuario(idUsuario);
     }
 
     public List<Cita> findProximasByUsuario(Long idUsuario) {
-        return citaRepository.findByUsuarioIdAndFechaCitaAfter(idUsuario, LocalDateTime.now());
+        return citaRepository.findByIdUsuarioAndFechaCitaAfter(idUsuario, LocalDateTime.now());
     }
 }

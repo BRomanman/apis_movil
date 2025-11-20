@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CitaRepository extends JpaRepository<Cita, Long> {
 
-    List<Cita> findByUsuarioId(Long idUsuario);
+    List<Cita> findByIdUsuario(Long idUsuario);
 
-    List<Cita> findByUsuarioIdAndFechaCitaAfter(Long idUsuario, LocalDateTime fecha);
+    List<Cita> findByIdUsuarioAndFechaCitaAfter(Long idUsuario, LocalDateTime fecha);
 }
