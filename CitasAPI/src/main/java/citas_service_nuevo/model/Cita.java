@@ -26,12 +26,12 @@ public class Cita {
     @Column(name = "estado", nullable = false)
     private String estado;
 
-    @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @jakarta.persistence.ManyToOne(cascade = jakarta.persistence.CascadeType.ALL) // <--- CAMBIO CLAVE
+    @jakarta.persistence.JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
-    @JoinColumn(name = "id_doctor", nullable = false)
+    @jakarta.persistence.ManyToOne(cascade = jakarta.persistence.CascadeType.ALL) // <--- CAMBIO CLAVE
+    @jakarta.persistence.JoinColumn(name = "id_doctor", nullable = false)
     private Doctor doctor;
 
     @Column(name = "id_consulta")
