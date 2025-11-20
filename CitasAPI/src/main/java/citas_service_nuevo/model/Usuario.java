@@ -1,11 +1,6 @@
 package citas_service_nuevo.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,33 +8,34 @@ import java.time.LocalDateTime;
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // Sin @GeneratedValue para usar el ID real que viene del Login
     @Column(name = "id_usuario")
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private String nombre;
 
-    @Column(nullable = false)
+    @Column
     private String apellido;
 
-    @Column(name = "fecha_nacimiento", nullable = false)
+    @Column(name = "fecha_nacimiento")
     private LocalDateTime fechaNacimiento;
 
-    @Column(nullable = false, unique = true)
+    @Column
     private String correo;
 
     @Column
     private String telefono;
 
-    @Column(nullable = false)
+    @Column
     private String contrasena;
 
-    @Column(name = "id_rol", nullable = false)
-    private Long idRol;
+    // [CORRECCIÓN] Eliminamos 'private Rol rol' porque CitasAPI no lo necesita.
 
     public Usuario() {
     }
+
+    // --- Getters y Setters ---
 
     public Long getId() {
         return id;
@@ -95,13 +91,5 @@ public class Usuario {
 
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
-    }
-
-    public Long getIdRol() {
-        return idRol;
-    }
-
-    public void setIdRol(Long idRol) {
-        this.idRol = idRol;
     }
 }
