@@ -56,4 +56,12 @@ public class CitaService {
     public boolean isDisponible(Long id) {
         return findById(id).getDisponible();
     }
+    // [NUEVO] Método para cancelar sin borrar
+    public Cita cancelarCita(Long id) {
+        Cita cita = findById(id);
+        cita.setEstado("CANCELADO");
+        // Opcional: Si quieres que el horario quede libre de nuevo, pon disponible = true
+        // cita.setDisponible(true); 
+        return citaRepository.save(cita);
+    }
 }
