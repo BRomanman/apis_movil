@@ -35,6 +35,16 @@ public class HistorialController {
         return ResponseEntity.ok(historiales);
     }
 
+    @GetMapping("/doctor/{doctorId}")
+    @Operation(summary = "Obtiene todos los historiales asociados a un doctor.")
+    public ResponseEntity<List<Historial>> getHistorialesByDoctorId(@PathVariable("doctorId") Long doctorId) {
+        List<Historial> historiales = historialService.findHistorialesByDoctorId(doctorId);
+        if (historiales.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(historiales);
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Busca un historial por ID Historial.")
     public ResponseEntity<Historial> getHistorialById(@PathVariable("id") Long id) {

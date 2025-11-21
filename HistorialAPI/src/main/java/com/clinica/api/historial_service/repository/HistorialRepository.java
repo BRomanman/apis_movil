@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface HistorialRepository extends JpaRepository<Historial, Long> {
 
     List<Historial> findByIdUsuario(Long idUsuario);
+
+    List<Historial> findByIdDoctor(Long idDoctor);
 }
