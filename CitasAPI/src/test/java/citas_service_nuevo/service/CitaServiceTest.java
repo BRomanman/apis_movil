@@ -90,11 +90,22 @@ class CitaServiceTest {
     @Test
     @DisplayName("findProximasByUsuario delega en el repositorio con la fecha actual")
     void findProximasByUsuario_delegatesToRepository() {
-        when(citaRepository.findByUsuarioIdAndFechaCitaAfter(any(Long.class), any(LocalDateTime.class)))
+        when(citaRepository.findByIdUsuarioAndFechaCitaAfter(any(Long.class), any(LocalDateTime.class)))
             .thenReturn(List.of());
 
         citaService.findProximasByUsuario(7L);
 
-        verify(citaRepository).findByUsuarioIdAndFechaCitaAfter(any(Long.class), any(LocalDateTime.class));
+        verify(citaRepository).findByIdUsuarioAndFechaCitaAfter(any(Long.class), any(LocalDateTime.class));
+    }
+
+    @Test
+    @DisplayName("findProximasByDoctor delega en el repositorio con la fecha actual")
+    void findProximasByDoctor_delegatesToRepository() {
+        when(citaRepository.findByIdDoctorAndFechaCitaAfter(any(Long.class), any(LocalDateTime.class)))
+            .thenReturn(List.of());
+
+        citaService.findProximasByDoctor(3L);
+
+        verify(citaRepository).findByIdDoctorAndFechaCitaAfter(any(Long.class), any(LocalDateTime.class));
     }
 }

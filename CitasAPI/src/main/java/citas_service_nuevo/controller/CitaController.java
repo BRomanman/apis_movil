@@ -10,6 +10,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -101,6 +102,16 @@ public class CitaController {
         return ResponseEntity.ok(citas);
     }
 
+    @GetMapping("/doctor/{idDoctor}/proximas")
+    @Operation(summary = "Recupera las próximas citas de un doctor a partir de la fecha actual.")
+    public ResponseEntity<List<Cita>> getProximasCitasByDoctor(@PathVariable("idDoctor") Long idDoctor) {
+        List<Cita> citas = citaService.findProximasByDoctor(idDoctor);
+        if (citas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(citas);
+    }
+
     @GetMapping("/doctor/{idDoctor}/fecha/{fecha}")
     @Operation(summary = "Lista las citas de un doctor en una fecha específica (formato yyyy-MM-dd).")
     public ResponseEntity<List<Cita>> getCitasPorDoctorYFecha(
@@ -134,6 +145,17 @@ public class CitaController {
     public ResponseEntity<Cita> cancelarCita(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(citaService.cancelarCita(id));
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Elimina una cita existente.")
+    public ResponseEntity<Void> deleteCita(@PathVariable("id") Long id) {
+        try {
+            citaService.deleteById(id);
+            return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.notFound().build();
         }

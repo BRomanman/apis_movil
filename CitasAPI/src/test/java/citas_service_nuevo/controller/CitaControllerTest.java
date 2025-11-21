@@ -10,12 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import citas_service_nuevo.model.Cita;
-import citas_service_nuevo.model.Doctor;
-import citas_service_nuevo.model.Usuario;
 import citas_service_nuevo.service.CitaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -114,18 +113,39 @@ class CitaControllerTest {
             .andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("GET /api/v1/citas/doctor/{idDoctor}/proximas responde 200 con registros futuros")
+    void getProximasCitasByDoctor_returnsOk() throws Exception {
+        Cita cita = sampleCita();
+        cita.setFechaCita(LocalDateTime.of(2025, 1, 1, 9, 0));
+        when(citaService.findProximasByDoctor(3L)).thenReturn(List.of(cita));
+
+        mockMvc.perform(get("/api/v1/citas/doctor/{idDoctor}/proximas", 3L))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].idDoctor").value(3L))
+            .andExpect(jsonPath("$[0].id").value(1L));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/citas/doctor/{idDoctor}/proximas responde 204 cuando no hay registros futuros")
+    void getProximasCitasByDoctor_returnsNoContent() throws Exception {
+        when(citaService.findProximasByDoctor(7L)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/v1/citas/doctor/{idDoctor}/proximas", 7L))
+            .andExpect(status().isNoContent());
+    }
+
     private Cita sampleCita() {
         Cita cita = new Cita();
         cita.setId(1L);
         cita.setEstado("CONFIRMADA");
         cita.setFechaCita(LocalDateTime.of(2024, 6, 1, 10, 0));
-        Usuario usuario = new Usuario();
-        usuario.setId(2L);
-        cita.setUsuario(usuario);
-        Doctor doctor = new Doctor();
-        doctor.setId(3L);
-        cita.setDoctor(doctor);
+        cita.setIdUsuario(2L);
+        cita.setIdDoctor(3L);
         cita.setIdConsulta(4L);
+        cita.setHoraInicio(LocalTime.of(10, 0));
+        cita.setHoraFin(LocalTime.of(10, 30));
+        cita.setDuracionMinutos(30);
         return cita;
     }
 }
