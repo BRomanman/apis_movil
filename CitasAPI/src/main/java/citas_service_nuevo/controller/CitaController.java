@@ -10,7 +10,6 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,10 +17,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
 @RequestMapping("/api/v1/citas")
-@CrossOrigin(origins = "http://localhost:5173")
 @Tag(name = "Citas")
 public class CitaController {
 
@@ -125,6 +124,16 @@ public class CitaController {
     public ResponseEntity<Boolean> isCitaDisponible(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(citaService.isDisponible(id));
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}/cancelar")
+    @Operation(summary = "Cancela una cita (cambia estado a CANCELADO).")
+    public ResponseEntity<Cita> cancelarCita(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(citaService.cancelarCita(id));
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.notFound().build();
         }
