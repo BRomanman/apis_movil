@@ -35,7 +35,9 @@ class HistorialControllerTest {
         historial.setId(1L);
         historial.setIdUsuario(9L);
         historial.setEstado("Realizada");
-        historial.setFechaCita(LocalDate.of(2024, 3, 1));
+        historial.setFechaConsulta(LocalDate.of(2024, 3, 1));
+        historial.setDiagnostico("Control hipertension");
+        historial.setObservaciones("Revision sin cambios");
 
         when(historialService.findHistorialesByUsuarioId(9L)).thenReturn(List.of(historial));
 
@@ -43,8 +45,10 @@ class HistorialControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id").value(1))
             .andExpect(jsonPath("$[0].estado").value("Realizada"))
-            .andExpect(jsonPath("$[0].fechaCita").value("2024-03-01"))
-            .andExpect(jsonPath("$[0].idUsuario").value(9));
+            .andExpect(jsonPath("$[0].fechaConsulta").value("2024-03-01"))
+            .andExpect(jsonPath("$[0].idUsuario").value(9))
+            .andExpect(jsonPath("$[0].diagnostico").value("Control hipertension"))
+            .andExpect(jsonPath("$[0].observaciones").value("Revision sin cambios"));
     }
 
     @Test
@@ -63,7 +67,9 @@ class HistorialControllerTest {
         historial.setId(15L);
         historial.setEstado("Cancelada");
         historial.setIdUsuario(42L);
-        historial.setFechaCita(LocalDate.of(2023, 12, 10));
+        historial.setFechaConsulta(LocalDate.of(2023, 12, 10));
+        historial.setDiagnostico("Gripe");
+        historial.setObservaciones("Reposo por 3 dias");
 
         when(historialService.findHistorialById(15L)).thenReturn(historial);
 
@@ -71,8 +77,10 @@ class HistorialControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(15))
             .andExpect(jsonPath("$.estado").value("Cancelada"))
-            .andExpect(jsonPath("$.fechaCita").value("2023-12-10"))
-            .andExpect(jsonPath("$.idUsuario").value(42));
+            .andExpect(jsonPath("$.fechaConsulta").value("2023-12-10"))
+            .andExpect(jsonPath("$.idUsuario").value(42))
+            .andExpect(jsonPath("$.diagnostico").value("Gripe"))
+            .andExpect(jsonPath("$.observaciones").value("Reposo por 3 dias"));
     }
 
     @Test

@@ -18,8 +18,8 @@ public class Historial {
     @Column(name = "id_historial")
     private Long id;
 
-    @Column(name = "fecha_cita", nullable = false)
-    private LocalDate fechaCita;
+    @Column(name = "fecha_historial", nullable = false)
+    private LocalDate fechaConsulta;
 
     @Column(name = "estado", nullable = false)
     private String estado;
@@ -57,8 +57,11 @@ public class Historial {
     @Column(name = "disponible", nullable = false)
     private Boolean disponible = Boolean.TRUE;
 
-    @Column(name = "observaciones_horario")
-    private String observacionesHorario;
+    @Column(name = "observaciones")
+    private String observaciones;
+
+    @Column(name = "diagnostico")
+    private String diagnostico;
 
     public Historial() {
     }
@@ -71,12 +74,12 @@ public class Historial {
         this.id = id;
     }
 
-    public LocalDate getFechaCita() {
-        return fechaCita;
+    public LocalDate getFechaConsulta() {
+        return fechaConsulta;
     }
 
-    public void setFechaCita(LocalDate fechaCita) {
-        this.fechaCita = fechaCita;
+    public void setFechaConsulta(LocalDate fechaConsulta) {
+        this.fechaConsulta = fechaConsulta;
     }
 
     public String getEstado() {
@@ -175,11 +178,19 @@ public class Historial {
         this.disponible = disponible;
     }
 
-    public String getObservacionesHorario() {
-        return observacionesHorario;
+    public String getObservaciones() {
+        return observaciones;
     }
 
-    public void setObservacionesHorario(String observacionesHorario) {
-        this.observacionesHorario = observacionesHorario;
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
+    }
+
+    public String getDiagnostico() {
+        return diagnostico;
+    }
+
+    public void setDiagnostico(String diagnostico) {
+        this.diagnostico = diagnostico;
     }
 }
