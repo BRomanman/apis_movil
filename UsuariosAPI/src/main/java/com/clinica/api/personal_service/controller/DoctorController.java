@@ -109,7 +109,7 @@ public class DoctorController {
 
         // --- LÓGICA BLINDADA ---
         // Buscamos todas las especialidades
-        List<com.clinica.api.personal_service.model.Especialidad> especialidades = especialidadRepository.findByDoctor(doctor);
+        List<com.clinica.api.personal_service.model.Especialidad> especialidades = especialidadRepository.findByDoctorId(doctor.getId());
         
         // Si hay al menos una, tomamos la primera. Si no, se queda null.
         if (!especialidades.isEmpty()) {

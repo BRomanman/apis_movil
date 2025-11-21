@@ -3,6 +3,7 @@ package com.clinica.api.personal_service.controller;
 import com.clinica.api.personal_service.dto.EspecialidadResponse;
 import com.clinica.api.personal_service.model.Especialidad;
 import com.clinica.api.personal_service.service.EspecialidadService;
+import com.clinica.api.personal_service.model.Doctor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
@@ -141,7 +142,9 @@ public class EspecialidadController {
         EspecialidadResponse response = new EspecialidadResponse();
         response.setId(especialidad.getId());
         response.setNombre(especialidad.getNombre());
-        response.setDoctorId(especialidad.getDoctor() != null ? especialidad.getDoctor().getId() : null);
+        response.setDoctorId(
+            especialidad.getDoctor() != null ? especialidad.getDoctor().getId() : null
+        );
         return response;
     }
 

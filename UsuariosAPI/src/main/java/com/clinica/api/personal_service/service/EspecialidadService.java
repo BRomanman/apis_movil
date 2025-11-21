@@ -28,7 +28,7 @@ public class EspecialidadService {
     public List<Especialidad> findByDoctorId(Long doctorId) {
         Doctor doctor = doctorRepository.findById(doctorId)
             .orElseThrow(() -> new EntityNotFoundException("Doctor no encontrado"));
-        return especialidadRepository.findByDoctor_Id(doctor.getId());
+        return especialidadRepository.findByDoctor(doctor);
     }
 
     public Especialidad createForDoctor(Long doctorId, String nombreEspecialidad) {
