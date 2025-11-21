@@ -35,8 +35,8 @@ public class HistorialController {
         return ResponseEntity.ok(historiales);
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Busca un historial por su identificador.")
+    @GetMapping("/{histId}")
+    @Operation(summary = "Busca un historial por ID Historial.")
     public ResponseEntity<Historial> getHistorialById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(historialService.findHistorialById(id));

@@ -19,5 +19,5 @@ import org.springframework.context.annotation.Configuration;
     }
 )
 public class OpenApiConfig {
-    // Configuración basada en anotaciones.
+    // Configuración basada en anotaciones
 }

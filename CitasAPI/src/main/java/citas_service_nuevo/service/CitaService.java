@@ -4,6 +4,7 @@ import citas_service_nuevo.model.Cita;
 import citas_service_nuevo.repository.CitaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -29,26 +30,30 @@ public class CitaService {
     }
 
     public Cita save(Cita cita) {
-        if (cita.getId() == null) {
-            cita.setEstado("CONFIRMADA");
+        if (cita.getEstado() == null) {
+            cita.setEstado("Disponible");
+        }
+        if (cita.getDisponible() == null) {
+            cita.setDisponible(Boolean.TRUE);
         }
         return citaRepository.save(cita);
     }
 
-    @SuppressWarnings("null")
-    public void deleteById(Long id) {
-        if (!citaRepository.existsById(id)) {
-            throw new EntityNotFoundException("Cita no encontrada");
-        }
-        citaRepository.deleteById(id);
-    }
-
     public List<Cita> findByUsuario(Long idUsuario) {
-        return citaRepository.findByUsuarioId(idUsuario);
+        return citaRepository.findByIdUsuario(idUsuario);
     }
 
-    // [NUEVO] Servicio para buscar por doctor
-    public List<Cita> findByDoctor(Long idDoctor) {
-        return citaRepository.findByDoctorId(idDoctor);
+    public List<Cita> findProximasByUsuario(Long idUsuario) {
+        return citaRepository.findByIdUsuarioAndFechaCitaAfter(idUsuario, LocalDateTime.now());
+    }
+
+    public List<Cita> findByDoctorAndFecha(Long idDoctor, LocalDate fecha) {
+        LocalDateTime inicioDelDia = fecha.atStartOfDay();
+        LocalDateTime finDelDia = fecha.plusDays(1).atStartOfDay();
+        return citaRepository.findByIdDoctorAndFechaCitaBetweenOrderByHoraInicio(idDoctor, inicioDelDia, finDelDia);
+    }
+
+    public boolean isDisponible(Long id) {
+        return findById(id).getDisponible();
     }
 }

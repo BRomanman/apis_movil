@@ -5,11 +5,12 @@ import citas_service_nuevo.service.CitaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,32 +73,60 @@ public class CitaController {
         try {
             Cita existente = citaService.findById(id);
             existente.setFechaCita(citaDetails.getFechaCita());
-            existente.setDoctor(citaDetails.getDoctor());
+            existente.setEstado(citaDetails.getEstado());
+            existente.setIdUsuario(citaDetails.getIdUsuario());
+            existente.setIdDoctor(citaDetails.getIdDoctor());
+            existente.setPago(citaDetails.getPago());
+            existente.setIdReceta(citaDetails.getIdReceta());
+            existente.setIdResena(citaDetails.getIdResena());
+            existente.setIdResumen(citaDetails.getIdResumen());
             existente.setIdConsulta(citaDetails.getIdConsulta());
+            existente.setHoraInicio(citaDetails.getHoraInicio());
+            existente.setHoraFin(citaDetails.getHoraFin());
+            existente.setDuracionMinutos(citaDetails.getDuracionMinutos());
+            existente.setDisponible(citaDetails.getDisponible());
+            existente.setObservacionesHorario(citaDetails.getObservacionesHorario());
             return ResponseEntity.ok(citaService.save(existente));
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Elimina una cita existente.")
-    public ResponseEntity<Void> deleteCita(@PathVariable("id") Long id) {
-        try {
-            citaService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException ex) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @GetMapping("/doctor/{idDoctor}")
-    @Operation(summary = "Lista las citas agendadas para un doctor específico.")
-    public ResponseEntity<List<Cita>> getCitasByDoctor(@PathVariable("idDoctor") Long idDoctor) {
-        List<Cita> citas = citaService.findByDoctor(idDoctor);
+    @GetMapping("/usuario/{idUsuario}/proximas")
+    @Operation(summary = "Recupera las próximas citas a partir de la fecha actual.")
+    public ResponseEntity<List<Cita>> getProximasCitasByUsuario(@PathVariable("idUsuario") Long idUsuario) {
+        List<Cita> citas = citaService.findProximasByUsuario(idUsuario);
         if (citas.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(citas);
+    }
+
+    @GetMapping("/doctor/{idDoctor}/fecha/{fecha}")
+    @Operation(summary = "Lista las citas de un doctor en una fecha específica (formato yyyy-MM-dd).")
+    public ResponseEntity<List<Cita>> getCitasPorDoctorYFecha(
+        @PathVariable("idDoctor") Long idDoctor,
+        @PathVariable("fecha") String fecha
+    ) {
+        try {
+            LocalDate fechaBusqueda = LocalDate.parse(fecha);
+            List<Cita> citas = citaService.findByDoctorAndFecha(idDoctor, fechaBusqueda);
+            if (citas.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(citas);
+        } catch (DateTimeParseException ex) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/{id}/disponible")
+    @Operation(summary = "Indica si una cita está disponible.")
+    public ResponseEntity<Boolean> isCitaDisponible(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(citaService.isDisponible(id));
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
