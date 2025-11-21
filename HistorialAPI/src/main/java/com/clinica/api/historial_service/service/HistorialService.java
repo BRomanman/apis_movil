@@ -21,6 +21,10 @@ public class HistorialService {
         return historialRepository.findByIdUsuario(usuarioId);
     }
 
+    public List<Historial> findHistorialesByDoctorId(Long doctorId) {
+        return historialRepository.findByIdDoctor(doctorId);
+    }
+
     @SuppressWarnings("null")
     public Historial findHistorialById(Long id) {
         return historialRepository.findById(id)

@@ -33,17 +33,18 @@ class HistorialControllerTest {
     void getHistorialesByUsuario_returnsOk() throws Exception {
         Historial historial = new Historial();
         historial.setId(1L);
-        historial.setDiagnostico("Diagnóstico control");
-        historial.setObservaciones("Sin observaciones");
-        historial.setFechaConsulta(LocalDate.of(2024, 3, 1));
+        historial.setIdUsuario(9L);
+        historial.setEstado("Realizada");
+        historial.setFechaCita(LocalDate.of(2024, 3, 1));
 
         when(historialService.findHistorialesByUsuarioId(9L)).thenReturn(List.of(historial));
 
         mockMvc.perform(get("/api/v1/historial/usuario/{usuarioId}", 9))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id").value(1))
-            .andExpect(jsonPath("$[0].diagnostico").value("Diagnóstico control"))
-            .andExpect(jsonPath("$[0].fechaConsulta").value("2024-03-01"));
+            .andExpect(jsonPath("$[0].estado").value("Realizada"))
+            .andExpect(jsonPath("$[0].fechaCita").value("2024-03-01"))
+            .andExpect(jsonPath("$[0].idUsuario").value(9));
     }
 
     @Test
@@ -60,17 +61,18 @@ class HistorialControllerTest {
     void getHistorialById_returnsOk() throws Exception {
         Historial historial = new Historial();
         historial.setId(15L);
-        historial.setDiagnostico("Control anual");
-        historial.setObservaciones("Todo en orden");
-        historial.setFechaConsulta(LocalDate.of(2023, 12, 10));
+        historial.setEstado("Cancelada");
+        historial.setIdUsuario(42L);
+        historial.setFechaCita(LocalDate.of(2023, 12, 10));
 
         when(historialService.findHistorialById(15L)).thenReturn(historial);
 
         mockMvc.perform(get("/api/v1/historial/{id}", 15))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(15))
-            .andExpect(jsonPath("$.diagnostico").value("Control anual"))
-            .andExpect(jsonPath("$.observaciones").value("Todo en orden"));
+            .andExpect(jsonPath("$.estado").value("Cancelada"))
+            .andExpect(jsonPath("$.fechaCita").value("2023-12-10"))
+            .andExpect(jsonPath("$.idUsuario").value(42));
     }
 
     @Test
