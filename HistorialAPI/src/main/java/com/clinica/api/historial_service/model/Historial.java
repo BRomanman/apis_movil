@@ -1,6 +1,5 @@
 package com.clinica.api.historial_service.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,9 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
-@Table(name = "historial")
+@Table(name = "Historial")
 public class Historial {
 
     @Id
@@ -18,18 +18,47 @@ public class Historial {
     @Column(name = "id_historial")
     private Long id;
 
-    @Column(name = "id_usuario", nullable = false)
+    @Column(name = "fecha_cita", nullable = false)
+    private LocalDate fechaCita;
+
+    @Column(name = "estado", nullable = false)
+    private String estado;
+
+    @Column(name = "id_usuario")
     private Long idUsuario;
 
-    @Column(name = "fecha_consulta", nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate fechaConsulta;
+    @Column(name = "id_doctor", nullable = false)
+    private Long idDoctor;
 
-    @Column(nullable = false)
-    private String diagnostico;
+    @Column(name = "pago")
+    private Long pago;
 
-    @Column(nullable = false)
-    private String observaciones;
+    @Column(name = "id_receta")
+    private Long idReceta;
+
+    @Column(name = "id_resena")
+    private Long idResena;
+
+    @Column(name = "id_resumen")
+    private Long idResumen;
+
+    @Column(name = "id_consulta")
+    private Long idConsulta;
+
+    @Column(name = "hora_inicio", nullable = false)
+    private LocalTime horaInicio;
+
+    @Column(name = "hora_fin", nullable = false)
+    private LocalTime horaFin;
+
+    @Column(name = "duracion_minutos", nullable = false)
+    private Integer duracionMinutos;
+
+    @Column(name = "disponible", nullable = false)
+    private Boolean disponible = Boolean.TRUE;
+
+    @Column(name = "observaciones_horario")
+    private String observacionesHorario;
 
     public Historial() {
     }
@@ -42,6 +71,22 @@ public class Historial {
         this.id = id;
     }
 
+    public LocalDate getFechaCita() {
+        return fechaCita;
+    }
+
+    public void setFechaCita(LocalDate fechaCita) {
+        this.fechaCita = fechaCita;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
     public Long getIdUsuario() {
         return idUsuario;
     }
@@ -50,27 +95,91 @@ public class Historial {
         this.idUsuario = idUsuario;
     }
 
-    public LocalDate getFechaConsulta() {
-        return fechaConsulta;
+    public Long getIdDoctor() {
+        return idDoctor;
     }
 
-    public void setFechaConsulta(LocalDate fechaConsulta) {
-        this.fechaConsulta = fechaConsulta;
+    public void setIdDoctor(Long idDoctor) {
+        this.idDoctor = idDoctor;
     }
 
-    public String getDiagnostico() {
-        return diagnostico;
+    public Long getPago() {
+        return pago;
     }
 
-    public void setDiagnostico(String diagnostico) {
-        this.diagnostico = diagnostico;
+    public void setPago(Long pago) {
+        this.pago = pago;
     }
 
-    public String getObservaciones() {
-        return observaciones;
+    public Long getIdReceta() {
+        return idReceta;
     }
 
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones;
+    public void setIdReceta(Long idReceta) {
+        this.idReceta = idReceta;
+    }
+
+    public Long getIdResena() {
+        return idResena;
+    }
+
+    public void setIdResena(Long idResena) {
+        this.idResena = idResena;
+    }
+
+    public Long getIdResumen() {
+        return idResumen;
+    }
+
+    public void setIdResumen(Long idResumen) {
+        this.idResumen = idResumen;
+    }
+
+    public Long getIdConsulta() {
+        return idConsulta;
+    }
+
+    public void setIdConsulta(Long idConsulta) {
+        this.idConsulta = idConsulta;
+    }
+
+    public LocalTime getHoraInicio() {
+        return horaInicio;
+    }
+
+    public void setHoraInicio(LocalTime horaInicio) {
+        this.horaInicio = horaInicio;
+    }
+
+    public LocalTime getHoraFin() {
+        return horaFin;
+    }
+
+    public void setHoraFin(LocalTime horaFin) {
+        this.horaFin = horaFin;
+    }
+
+    public Integer getDuracionMinutos() {
+        return duracionMinutos;
+    }
+
+    public void setDuracionMinutos(Integer duracionMinutos) {
+        this.duracionMinutos = duracionMinutos;
+    }
+
+    public Boolean getDisponible() {
+        return disponible;
+    }
+
+    public void setDisponible(Boolean disponible) {
+        this.disponible = disponible;
+    }
+
+    public String getObservacionesHorario() {
+        return observacionesHorario;
+    }
+
+    public void setObservacionesHorario(String observacionesHorario) {
+        this.observacionesHorario = observacionesHorario;
     }
 }
