@@ -14,6 +14,10 @@ java {
     }
 }
 
+springBoot {
+    mainClass.set("com.clinica.api.historial_service.HistorialServiceApplication")
+}
+
 repositories {
     mavenCentral()
 }
