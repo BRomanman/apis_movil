@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/doctores")
-@Tag(name = "Doctores")
+@Tag(name = "Doctores", description = "API para administrar la ficha laboral y remuneraciones de los médicos de la institución.")
 public class DoctorController {
 
     private final PersonalService personalService;
@@ -38,7 +38,10 @@ public class DoctorController {
     }
 
     @GetMapping
-    @Operation(summary = "Lista los doctores activos.")
+    @Operation(
+        summary = "Lista los doctores activos.",
+        description = "Entrega el listado filtrado sólo con doctores vigentes e incluye los datos económicos y la especialidad principal."
+    )
     public ResponseEntity<List<DoctorResponse>> getAllDoctores() {
         List<Doctor> doctores = personalService.findAllDoctores();
         if (doctores.isEmpty()) {
@@ -51,7 +54,11 @@ public class DoctorController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Obtiene la información del doctor por su ID.")
+    @Operation(
+        summary = "Obtiene la información del doctor por su ID.",
+        description = "Devuelve el detalle completo de un doctor específico, incluyendo los datos del usuario asociado. "
+            + "Si el ID no corresponde a un doctor activo, retorna 404."
+    )
     public ResponseEntity<DoctorResponse> getDoctorById(@PathVariable("id") Long id) {
         try {
             Doctor doctor = personalService.findDoctorById(id);
@@ -62,14 +69,21 @@ public class DoctorController {
     }
 
     @PostMapping
-    @Operation(summary = "Crea un nuevo doctor.")
+    @Operation(
+        summary = "Crea un nuevo doctor.",
+        description = "Registra un profesional con su información contractual y de usuario, respondiendo 201 al persistirlo."
+    )
     public ResponseEntity<DoctorResponse> createDoctor(@RequestBody Doctor doctor) {
         Doctor nuevoDoctor = personalService.saveDoctor(requireDoctorPayload(doctor));
         return ResponseEntity.status(HttpStatus.CREATED).body(mapToResponse(nuevoDoctor));
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualiza los datos económicos del doctor.")
+    @Operation(
+        summary = "Actualiza los datos económicos del doctor.",
+        description = "Permite modificar tarifa, sueldo, bono y datos del usuario asociado de manera segura. "
+            + "Cuando el médico no existe se responde 404."
+    )
     public ResponseEntity<DoctorResponse> updateDoctor(
         @PathVariable("id") Long id,
         @RequestBody Doctor doctorDetails
@@ -89,7 +103,10 @@ public class DoctorController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Marca como inactivo a un doctor.")
+    @Operation(
+        summary = "Marca como inactivo a un doctor.",
+        description = "Realiza una baja lógica para impedir nuevas asignaciones, devolviendo 204 o 404 si el doctor no existe."
+    )
     public ResponseEntity<Void> deleteDoctor(@PathVariable("id") Long id) {
         try {
             personalService.deleteDoctorById(id);

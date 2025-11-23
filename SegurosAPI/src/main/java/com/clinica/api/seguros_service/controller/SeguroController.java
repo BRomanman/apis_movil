@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/seguros")
-@Tag(name = "Seguros")
+@Tag(name = "Seguros", description = "Operaciones para administrar los planes de seguros médicos ofrecidos por la clínica.")
 public class SeguroController {
 
     private final SeguroService seguroService;
@@ -29,7 +29,11 @@ public class SeguroController {
     }
 
     @GetMapping
-    @Operation(summary = "Lista todos los seguros disponibles.")
+    @Operation(
+        summary = "Lista todos los seguros disponibles.",
+        description = "Devuelve el catálogo vigente de seguros con su información esencial. "
+            + "Responde 204 No Content cuando no existen planes configurados."
+    )
     public ResponseEntity<List<Seguro>> listarSeguros() {
         List<Seguro> seguros = seguroService.findAllSeguros();
         if (seguros.isEmpty()) {
@@ -39,7 +43,10 @@ public class SeguroController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Obtiene los detalles de un seguro por su ID.")
+    @Operation(
+        summary = "Obtiene los detalles de un seguro por su ID.",
+        description = "Permite inspeccionar un plan particular y responde 404 cuando el identificador no pertenece a ningún seguro."
+    )
     public ResponseEntity<Seguro> obtenerSeguro(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(seguroService.findSeguroById(id));
@@ -49,13 +56,20 @@ public class SeguroController {
     }
 
     @PostMapping
-    @Operation(summary = "Crea un nuevo seguro.")
+    @Operation(
+        summary = "Crea un nuevo seguro.",
+        description = "Registra un plan de seguro con la información proporcionada y devuelve 201 con el recurso almacenado."
+    )
     public ResponseEntity<Seguro> crearSeguro(@RequestBody Seguro seguro) {
         return ResponseEntity.status(HttpStatus.CREATED).body(seguroService.createSeguro(seguro));
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualiza la información del seguro.")
+    @Operation(
+        summary = "Actualiza la información del seguro.",
+        description = "Reemplaza los atributos fundamentales del plan (nombre, descripción y valor) para mantenerlo al día. "
+            + "Cuando el ID no existe se responde 404."
+    )
     public ResponseEntity<Seguro> actualizarSeguro(
         @PathVariable("id") Long id,
         @RequestBody Seguro seguro
@@ -68,7 +82,11 @@ public class SeguroController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Elimina un seguro.")
+    @Operation(
+        summary = "Elimina un seguro.",
+        description = "Borra definitivamente el plan indicado y responde 204 al completar la operación. "
+            + "Un identificador inexistente provoca una respuesta 404."
+    )
     public ResponseEntity<Void> eliminarSeguro(@PathVariable("id") Long id) {
         try {
             seguroService.deleteSeguro(id);

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@Tag(name = "Autenticación")
+@Tag(name = "Autenticación", description = "Endpoints para validar credenciales y recuperar información básica de la sesión.")
 public class AuthController {
 
     private final UsuarioService usuarioService;
@@ -25,7 +25,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Valida las credenciales del usuario y retorna su rol.")
+    @Operation(
+        summary = "Valida las credenciales del usuario y retorna su rol.",
+        description = "Verifica correo y contraseña contra la base de datos y entrega información del usuario y su rol para construir la sesión. "
+            + "Responde 401 cuando las credenciales no son válidas."
+    )
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         LoginRequest safeRequest = Objects.requireNonNull(request, "Credenciales requeridas");
         try {

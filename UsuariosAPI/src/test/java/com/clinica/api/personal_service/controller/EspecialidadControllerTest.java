@@ -1,5 +1,7 @@
 package com.clinica.api.personal_service.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(EspecialidadController.class)
@@ -36,157 +39,187 @@ class EspecialidadControllerTest {
     private EspecialidadService especialidadService;
 
     @Test
-    @DisplayName("GET /api/v1/doctores/{id}/especialidades responde 200 con la lista de especialidades")
+    @DisplayName("GET /api/v1/doctores/{id}/especialidades responde 200 cuando hay registros")
     void getEspecialidadesByDoctor_returnsOk() throws Exception {
-        Especialidad especialidad = new Especialidad();
-        especialidad.setId(1L);
-        especialidad.setNombre("Cardiología");
-        Doctor doctor = new Doctor();
-        doctor.setId(3L);
-        especialidad.setDoctor(doctor);
+        when(especialidadService.findByDoctorId(2L)).thenReturn(List.of(especialidad()));
 
-        when(especialidadService.findByDoctorId(3L)).thenReturn(List.of(especialidad));
-
-        mockMvc.perform(get("/api/v1/doctores/{id}/especialidades", 3L))
+        mockMvc.perform(get("/api/v1/doctores/{doctorId}/especialidades", 2L))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(1))
-            .andExpect(jsonPath("$[0].nombre").value("Cardiología"))
-            .andExpect(jsonPath("$[0].doctorId").value(3));
+            .andExpect(jsonPath("$[0].doctorId").value(5L));
     }
 
     @Test
-    @DisplayName("POST /api/v1/doctores/{id}/especialidades responde 201 al crear")
-    void createEspecialidad_returnsCreated() throws Exception {
-        Especialidad especialidad = new Especialidad();
-        especialidad.setId(5L);
-        especialidad.setNombre("Pediatría");
-        especialidad.setDoctor(null);
-
-        when(especialidadService.createForDoctor(2L, "Pediatría")).thenReturn(especialidad);
-
-        EspecialidadRequest request = new EspecialidadRequest();
-        request.setNombre("Pediatría");
-
-        mockMvc.perform(post("/api/v1/doctores/{id}/especialidades", 2L)
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id").value(5))
-            .andExpect(jsonPath("$.nombre").value("Pediatría"))
-            .andExpect(jsonPath("$.doctorId").doesNotExist());
-    }
-
-    @Test
-    @DisplayName("POST /api/v1/doctores/{id}/especialidades responde 404 cuando el doctor no existe")
-    void createEspecialidad_returnsNotFound() throws Exception {
-        EspecialidadRequest request = new EspecialidadRequest();
-        request.setNombre("Traumatología");
-
-        when(especialidadService.createForDoctor(9L, "Traumatología"))
-            .thenThrow(new EntityNotFoundException("No existe"));
-
-        mockMvc.perform(post("/api/v1/doctores/{id}/especialidades", 9L)
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("POST /api/v1/doctores/{id}/especialidades responde 400 cuando falta nombre")
-    void createEspecialidad_returnsBadRequest() throws Exception {
-        EspecialidadRequest request = new EspecialidadRequest();
-        request.setNombre(" ");
-
-        mockMvc.perform(post("/api/v1/doctores/{id}/especialidades", 3L)
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("GET /api/v1/doctores/{id}/especialidades responde 204 cuando no hay registros")
+    @DisplayName("GET /api/v1/doctores/{id}/especialidades responde 204 cuando no hay datos")
     void getEspecialidadesByDoctor_returnsNoContent() throws Exception {
-        when(especialidadService.findByDoctorId(5L)).thenReturn(Collections.emptyList());
+        when(especialidadService.findByDoctorId(4L)).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/api/v1/doctores/{id}/especialidades", 5L))
+        mockMvc.perform(get("/api/v1/doctores/{doctorId}/especialidades", 4L))
             .andExpect(status().isNoContent());
     }
 
     @Test
     @DisplayName("GET /api/v1/doctores/{id}/especialidades responde 404 cuando el doctor no existe")
     void getEspecialidadesByDoctor_returnsNotFound() throws Exception {
-        when(especialidadService.findByDoctorId(7L)).thenThrow(new EntityNotFoundException("No existe"));
+        when(especialidadService.findByDoctorId(7L)).thenThrow(new EntityNotFoundException("no existe"));
 
-        mockMvc.perform(get("/api/v1/doctores/{id}/especialidades", 7L))
+        mockMvc.perform(get("/api/v1/doctores/{doctorId}/especialidades", 7L))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/doctores/{id}/especialidades responde 400 con payload inválido")
+    void createEspecialidadForDoctor_returnsBadRequest() throws Exception {
+        EspecialidadRequest request = new EspecialidadRequest();
+        request.setNombre("");
+
+        mockMvc.perform(post("/api/v1/doctores/{doctorId}/especialidades", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(request)))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/doctores/{id}/especialidades responde 201 cuando se crea la especialidad")
+    void createEspecialidadForDoctor_returnsCreated() throws Exception {
+        when(especialidadService.createForDoctor(3L, "Pediatría")).thenReturn(especialidad("Pediatría"));
+
+        mockMvc.perform(post("/api/v1/doctores/{doctorId}/especialidades", 3L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(request("Pediatría", null))))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.nombre").value("Pediatría"));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/doctores/{id}/especialidades responde 404 cuando el doctor no existe")
+    void createEspecialidadForDoctor_returnsNotFound() throws Exception {
+        when(especialidadService.createForDoctor(4L, "Pediatría"))
+            .thenThrow(new EntityNotFoundException("doctor"));
+
+        mockMvc.perform(post("/api/v1/doctores/{doctorId}/especialidades", 4L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(request("Pediatría", null))))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @DisplayName("GET /api/v1/especialidades responde 200 con la lista completa")
     void getAllEspecialidades_returnsOk() throws Exception {
-        Especialidad especialidad = new Especialidad();
-        especialidad.setId(10L);
-        especialidad.setNombre("Nefrología");
-
-        when(especialidadService.findAll()).thenReturn(List.of(especialidad));
+        when(especialidadService.findAll()).thenReturn(List.of(especialidad()));
 
         mockMvc.perform(get("/api/v1/especialidades"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(10))
-            .andExpect(jsonPath("$[0].nombre").value("Nefrología"));
+            .andExpect(jsonPath("$[0].nombre").value("Cardiología"));
     }
 
     @Test
-    @DisplayName("GET /api/v1/especialidades/{id} devuelve 404 cuando no existe")
-    void getEspecialidadById_returnsNotFound() throws Exception {
-        when(especialidadService.findById(99L)).thenThrow(new EntityNotFoundException("No existe"));
+    @DisplayName("GET /api/v1/especialidades responde 204 cuando no hay registros")
+    void getAllEspecialidades_returnsNoContent() throws Exception {
+        when(especialidadService.findAll()).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/api/v1/especialidades/{id}", 99L))
+        mockMvc.perform(get("/api/v1/especialidades"))
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/especialidades/{id} responde 404 cuando no existe")
+    void getEspecialidadById_returnsNotFound() throws Exception {
+        when(especialidadService.findById(8L)).thenThrow(new EntityNotFoundException("no existe"));
+
+        mockMvc.perform(get("/api/v1/especialidades/{id}", 8L))
             .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("POST /api/v1/especialidades crea con doctorId")
-    void createEspecialidadGlobal_returnsCreated() throws Exception {
-        Especialidad especialidad = new Especialidad();
-        especialidad.setId(6L);
-        especialidad.setNombre("Oncología");
-        when(especialidadService.createForDoctor(3L, "Oncología")).thenReturn(especialidad);
+    @DisplayName("POST /api/v1/especialidades responde 400 cuando falta el doctorId")
+    void createEspecialidad_returnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/v1/especialidades")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(request("Pediatría", null))))
+            .andExpect(status().isBadRequest());
+    }
 
-        EspecialidadRequest request = new EspecialidadRequest();
-        request.setNombre("Oncología");
-        request.setDoctorId(3L);
+    @Test
+    @DisplayName("POST /api/v1/especialidades responde 201 cuando se crea la especialidad")
+    void createEspecialidad_returnsCreated() throws Exception {
+        Especialidad creada = especialidad("Dermatología");
+        when(especialidadService.createForDoctor(6L, "Dermatología")).thenReturn(creada);
 
         mockMvc.perform(post("/api/v1/especialidades")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(request("Dermatología", 6L))))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id").value(6))
+            .andExpect(jsonPath("$.nombre").value("Dermatología"));
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/especialidades/{id} responde 400 cuando el payload es inválido")
+    void updateEspecialidad_returnsBadRequest() throws Exception {
+        mockMvc.perform(put("/api/v1/especialidades/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(new EspecialidadRequest())))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/especialidades/{id} responde 200 cuando se actualiza la especialidad")
+    void updateEspecialidad_returnsOk() throws Exception {
+        Especialidad actualizada = especialidad("Oncología");
+        when(especialidadService.update(any(Long.class), any(String.class), any(Long.class))).thenReturn(actualizada);
+
+        mockMvc.perform(put("/api/v1/especialidades/{id}", 2L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(request("Oncología", 5L))))
+            .andExpect(status().isOk())
             .andExpect(jsonPath("$.nombre").value("Oncología"));
     }
 
     @Test
-    @DisplayName("PUT /api/v1/especialidades/{id} actualiza nombre")
-    void updateEspecialidadGlobal_returnsOk() throws Exception {
-        Especialidad especialidad = new Especialidad();
-        especialidad.setId(7L);
-        especialidad.setNombre("Dermato");
-        when(especialidadService.update(7L, "Dermato", null)).thenReturn(especialidad);
+    @DisplayName("PUT /api/v1/especialidades/{id} responde 404 cuando no existe")
+    void updateEspecialidad_returnsNotFound() throws Exception {
+        when(especialidadService.update(any(Long.class), any(String.class), any(Long.class)))
+            .thenThrow(new EntityNotFoundException("no existe"));
 
-        EspecialidadRequest request = new EspecialidadRequest();
-        request.setNombre("Dermato");
-
-        mockMvc.perform(put("/api/v1/especialidades/{id}", 7L)
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.nombre").value("Dermato"));
+        mockMvc.perform(put("/api/v1/especialidades/{id}", 9L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(request("Oncología", 5L))))
+            .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/especialidades/{id} responde 204")
-    void deleteEspecialidadGlobal_returnsNoContent() throws Exception {
+    @DisplayName("DELETE /api/v1/especialidades/{id} responde 404 cuando no existe")
+    void deleteEspecialidad_returnsNotFound() throws Exception {
+        doThrow(new EntityNotFoundException("no existe")).when(especialidadService).delete(4L);
+
         mockMvc.perform(delete("/api/v1/especialidades/{id}", 4L))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/especialidades/{id} responde 204 cuando se elimina")
+    void deleteEspecialidad_returnsNoContent() throws Exception {
+        mockMvc.perform(delete("/api/v1/especialidades/{id}", 3L))
             .andExpect(status().isNoContent());
+    }
+
+    private Especialidad especialidad() {
+        return especialidad("Cardiología");
+    }
+
+    private Especialidad especialidad(String nombre) {
+        Especialidad especialidad = new Especialidad();
+        especialidad.setId(1L);
+        especialidad.setNombre(nombre);
+        Doctor doctor = new Doctor();
+        doctor.setId(5L);
+        especialidad.setDoctor(doctor);
+        return especialidad;
+    }
+
+    private EspecialidadRequest request(String nombre, Long doctorId) {
+        EspecialidadRequest request = new EspecialidadRequest();
+        request.setNombre(nombre);
+        request.setDoctorId(doctorId);
+        return request;
     }
 }

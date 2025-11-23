@@ -1,6 +1,7 @@
 package com.clinica.api.personal_service.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,18 +40,17 @@ class UsuarioControllerTest {
     private UsuarioService usuarioService;
 
     @Test
-    @DisplayName("GET /api/v1/usuarios responde 200 con usuarios")
+    @DisplayName("GET /api/v1/usuarios responde 200 con la lista de usuarios")
     void getAllUsuarios_returnsOk() throws Exception {
-        UsuarioResponse response = usuarioResponse(1L);
-        when(usuarioService.findAllUsuarios()).thenReturn(List.of(response));
+        when(usuarioService.findAllUsuarios()).thenReturn(List.of(usuarioResponse()));
 
         mockMvc.perform(get("/api/v1/usuarios"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(1L));
+            .andExpect(jsonPath("$[0].correo").value("ana@demo.com"));
     }
 
     @Test
-    @DisplayName("GET /api/v1/usuarios responde 204 cuando no existen datos")
+    @DisplayName("GET /api/v1/usuarios responde 204 cuando no hay registros")
     void getAllUsuarios_returnsNoContent() throws Exception {
         when(usuarioService.findAllUsuarios()).thenReturn(Collections.emptyList());
 
@@ -59,71 +59,115 @@ class UsuarioControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/usuarios/{id} responde 404 cuando el servicio lanza EntityNotFoundException")
-    void getUsuarioById_returnsNotFound() throws Exception {
-        when(usuarioService.findUsuarioById(9L)).thenThrow(new EntityNotFoundException("No existe"));
+    @DisplayName("GET /api/v1/usuarios/{id} responde 200 cuando el usuario existe")
+    void getUsuarioById_returnsOk() throws Exception {
+        when(usuarioService.findUsuarioById(1L)).thenReturn(usuarioResponse());
 
-        mockMvc.perform(get("/api/v1/usuarios/{id}", 9L))
+        mockMvc.perform(get("/api/v1/usuarios/{id}", 1L))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1L));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/usuarios/{id} responde 404 cuando no existe")
+    void getUsuarioById_returnsNotFound() throws Exception {
+        when(usuarioService.findUsuarioById(6L)).thenThrow(new EntityNotFoundException("no existe"));
+
+        mockMvc.perform(get("/api/v1/usuarios/{id}", 6L))
             .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("POST /api/v1/usuarios responde 201 cuando se crea el usuario")
+    @DisplayName("POST /api/v1/usuarios responde 201 con el usuario creado")
     void createUsuario_returnsCreated() throws Exception {
-        Usuario request = usuario();
         Usuario saved = usuario();
-        saved.setId(5L);
-        UsuarioResponse response = usuarioResponse(5L);
-
+        saved.setId(1L);
         when(usuarioService.saveUsuario(any(Usuario.class))).thenReturn(saved);
-        when(usuarioService.findUsuarioById(5L)).thenReturn(response);
+        when(usuarioService.findUsuarioById(saved.getId())).thenReturn(usuarioResponse());
 
         mockMvc.perform(post("/api/v1/usuarios")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsBytes(usuarioPayload())))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id").value(5L));
+            .andExpect(jsonPath("$.id").value(1L));
     }
 
     @Test
-    @DisplayName("PUT /api/v1/usuarios/{id} responde 404 cuando el usuario no existe")
-    void updateUsuario_returnsNotFound() throws Exception {
-        Usuario usuario = usuario();
-        when(usuarioService.updateUsuario(any(Long.class), any(Usuario.class)))
-            .thenThrow(new EntityNotFoundException("No existe"));
+    @DisplayName("PUT /api/v1/usuarios/{id} responde 200 con el usuario actualizado")
+    void updateUsuario_returnsOk() throws Exception {
+        Usuario actualizado = usuario();
+        actualizado.setId(1L);
+        when(usuarioService.updateUsuario(any(Long.class), any(Usuario.class))).thenReturn(actualizado);
+        when(usuarioService.findUsuarioById(actualizado.getId())).thenReturn(usuarioResponse());
 
-        mockMvc.perform(put("/api/v1/usuarios/{id}", 2L)
+        mockMvc.perform(put("/api/v1/usuarios/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(usuario)))
+                .content(objectMapper.writeValueAsBytes(usuarioPayload())))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.correo").value("ana@demo.com"));
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/usuarios/{id} responde 404 cuando no existe")
+    void updateUsuario_returnsNotFound() throws Exception {
+        when(usuarioService.updateUsuario(any(Long.class), any(Usuario.class)))
+            .thenThrow(new EntityNotFoundException("no existe"));
+
+        mockMvc.perform(put("/api/v1/usuarios/{id}", 7L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(usuarioPayload())))
             .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/usuarios/{id} responde 204 cuando se elimina")
+    @DisplayName("DELETE /api/v1/usuarios/{id} responde 204 cuando se elimina correctamente")
     void deleteUsuario_returnsNoContent() throws Exception {
         mockMvc.perform(delete("/api/v1/usuarios/{id}", 3L))
             .andExpect(status().isNoContent());
     }
 
-    private UsuarioResponse usuarioResponse(Long id) {
-        UsuarioResponse response = new UsuarioResponse();
-        response.setId(id);
-        response.setNombre("Ana");
-        response.setApellido("Pérez");
-        response.setCorreo("ana@demo.com");
-        return response;
+    @Test
+    @DisplayName("DELETE /api/v1/usuarios/{id} responde 404 cuando no existe")
+    void deleteUsuario_returnsNotFound() throws Exception {
+        doThrow(new EntityNotFoundException("no existe")).when(usuarioService).deleteUsuarioById(9L);
+
+        mockMvc.perform(delete("/api/v1/usuarios/{id}", 9L))
+            .andExpect(status().isNotFound());
     }
 
     private Usuario usuario() {
         Usuario usuario = new Usuario();
         usuario.setNombre("Ana");
-        usuario.setApellido("Pérez");
+        usuario.setApellido("Gómez");
         usuario.setCorreo("ana@demo.com");
-        usuario.setContrasena("clave");
-        usuario.setFechaNacimiento(LocalDateTime.now());
-        Rol rol = new Rol();
-        rol.setNombre("Paciente");
-        usuario.setRol(rol);
+        usuario.setTelefono("+56911111111");
+        usuario.setFechaNacimiento(LocalDateTime.of(1995, 3, 15, 0, 0));
+        usuario.setContrasena("secreta");
+        usuario.setRol(rol("paciente"));
         return usuario;
+    }
+
+    private Usuario usuarioPayload() {
+        Usuario usuario = usuario();
+        usuario.setId(null);
+        return usuario;
+    }
+
+    private Rol rol(String nombre) {
+        Rol rol = new Rol();
+        rol.setId(2L);
+        rol.setNombre(nombre);
+        return rol;
+    }
+
+    private UsuarioResponse usuarioResponse() {
+        UsuarioResponse response = new UsuarioResponse();
+        response.setId(1L);
+        response.setNombre("Ana");
+        response.setApellido("Gómez");
+        response.setCorreo("ana@demo.com");
+        response.setTelefono("+56911111111");
+        response.setRol("paciente");
+        return response;
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/historial")
-@Tag(name = "Historial clínico")
+@Tag(name = "Historial clínico", description = "Endpoints para consultar los antecedentes clínicos y evolutivos de pacientes y doctores.")
 public class HistorialController {
 
     private final HistorialService historialService;
@@ -24,7 +24,10 @@ public class HistorialController {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    @Operation(summary = "Obtiene todos los historiales asociados a un usuario.")
+    @Operation(
+        summary = "Obtiene todos los historiales asociados a un usuario.",
+        description = "Provee el detalle clínico completo de un paciente específico, devolviendo 204 si aún no registra atenciones."
+    )
     public ResponseEntity<List<Historial>> getHistorialesByUsuarioId(@PathVariable("usuarioId") Long usuarioId) {
         List<Historial> historiales = historialService.findHistorialesByUsuarioId(usuarioId);
         if (historiales.isEmpty()) {
@@ -34,7 +37,11 @@ public class HistorialController {
     }
 
     @GetMapping("/doctor/{doctorId}")
-    @Operation(summary = "Obtiene todos los historiales asociados a un doctor.")
+    @Operation(
+        summary = "Obtiene todos los historiales asociados a un doctor.",
+        description = "Permite revisar todas las atenciones realizadas por un médico para análisis de desempeño u ocupación. "
+            + "Cuando no tiene historiales, se responde 204."
+    )
     public ResponseEntity<List<Historial>> getHistorialesByDoctorId(@PathVariable("doctorId") Long doctorId) {
         List<Historial> historiales = historialService.findHistorialesByDoctorId(doctorId);
         if (historiales.isEmpty()) {
@@ -44,7 +51,11 @@ public class HistorialController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Busca un historial por ID Historial.")
+    @Operation(
+        summary = "Busca un historial por ID Historial.",
+        description = "Entrega los datos clínicos detallados de un historial específico. "
+            + "Si el identificador no existe, se devuelve 404 Not Found."
+    )
     public ResponseEntity<Historial> getHistorialById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(historialService.findHistorialById(id));

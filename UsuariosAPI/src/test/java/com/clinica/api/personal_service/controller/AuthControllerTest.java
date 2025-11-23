@@ -31,39 +31,45 @@ class AuthControllerTest {
     @MockBean
     private UsuarioService usuarioService;
 
-    @SuppressWarnings("null")
     @Test
     @DisplayName("POST /api/v1/auth/login responde 200 con los datos del usuario")
     void login_returnsOk() throws Exception {
-        LoginResponse response = new LoginResponse();
-        response.setUserId(1L);
-        response.setRole("paciente");
-        when(usuarioService.login(any(LoginRequest.class))).thenReturn(response);
-
-        LoginRequest request = new LoginRequest();
-        request.setCorreo("correo@demo.com");
-        request.setContrasena("clave");
+        when(usuarioService.login(any(LoginRequest.class))).thenReturn(loginResponse());
 
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(loginRequest())))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.userId").value(1L));
+            .andExpect(jsonPath("$.role").value("doctor"))
+            .andExpect(jsonPath("$.doctorId").value(5L));
     }
 
-    @SuppressWarnings("null")
     @Test
-    @DisplayName("POST /api/v1/auth/login responde 401 cuando las credenciales no son válidas")
+    @DisplayName("POST /api/v1/auth/login responde 401 cuando las credenciales son inválidas")
     void login_returnsUnauthorized() throws Exception {
-        when(usuarioService.login(any(LoginRequest.class))).thenThrow(new EntityNotFoundException("No existe"));
-
-        LoginRequest request = new LoginRequest();
-        request.setCorreo("correo@demo.com");
-        request.setContrasena("incorrecto");
+        when(usuarioService.login(any(LoginRequest.class))).thenThrow(new EntityNotFoundException("credenciales"));
 
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(loginRequest())))
             .andExpect(status().isUnauthorized());
+    }
+
+    private LoginRequest loginRequest() {
+        LoginRequest request = new LoginRequest();
+        request.setCorreo("user@demo.com");
+        request.setContrasena("123");
+        return request;
+    }
+
+    private LoginResponse loginResponse() {
+        LoginResponse response = new LoginResponse();
+        response.setUserId(2L);
+        response.setRole("doctor");
+        response.setDoctorId(5L);
+        response.setNombre("Ana");
+        response.setApellido("Gómez");
+        response.setCorreo("user@demo.com");
+        return response;
     }
 }

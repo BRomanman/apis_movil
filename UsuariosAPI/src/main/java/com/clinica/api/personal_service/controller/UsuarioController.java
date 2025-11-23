@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
-@Tag(name = "Usuarios")
+@Tag(name = "Usuarios", description = "Servicios para administrar cuentas de pacientes y personal no administrador.")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -31,7 +31,10 @@ public class UsuarioController {
     }
 
     @GetMapping
-    @Operation(summary = "Lista los usuarios no administradores.")
+    @Operation(
+        summary = "Lista los usuarios no administradores.",
+        description = "Recupera únicamente cuentas no administrativas para evitar exponer perfiles críticos."
+    )
     public ResponseEntity<List<UsuarioResponse>> getAllUsuarios() {
         List<UsuarioResponse> usuarios = usuarioService.findAllUsuarios();
         if (usuarios.isEmpty()) {
@@ -41,7 +44,10 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Obtiene un usuario por su identificador.")
+    @Operation(
+        summary = "Obtiene un usuario por su identificador.",
+        description = "Retorna la información del usuario si no es administrador; de lo contrario responde 404 para mantener seguridad."
+    )
     public ResponseEntity<UsuarioResponse> getUsuarioById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(usuarioService.findUsuarioById(id));
@@ -51,7 +57,10 @@ public class UsuarioController {
     }
 
     @PostMapping
-    @Operation(summary = "Crea un nuevo usuario.")
+    @Operation(
+        summary = "Crea un nuevo usuario.",
+        description = "Registra una nueva cuenta respetando las reglas de exclusión de administradores y devuelve 201 con el DTO resultante."
+    )
     public ResponseEntity<UsuarioResponse> createUsuario(@RequestBody Usuario usuario) {
         Usuario safeUsuario = requireUsuarioPayload(usuario);
         Usuario saved = usuarioService.saveUsuario(safeUsuario);
@@ -59,7 +68,10 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualiza un usuario existente.")
+    @Operation(
+        summary = "Actualiza un usuario existente.",
+        description = "Permite modificar datos personales y credenciales cuando el usuario no es administrador, retornando el estado actualizado."
+    )
     public ResponseEntity<UsuarioResponse> updateUsuario(
         @PathVariable("id") Long id,
         @RequestBody Usuario usuarioDetails
@@ -74,7 +86,10 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Elimina un usuario no administrador.")
+    @Operation(
+        summary = "Elimina un usuario no administrador.",
+        description = "Elimina permanentemente la cuenta siempre que no sea administrativa; de lo contrario responde 404."
+    )
     public ResponseEntity<Void> deleteUsuario(@PathVariable("id") Long id) {
         try {
             usuarioService.deleteUsuarioById(id);
