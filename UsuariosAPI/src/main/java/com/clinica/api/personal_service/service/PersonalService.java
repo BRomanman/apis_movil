@@ -19,12 +19,16 @@ public class PersonalService {
     }
 
     public List<Doctor> findAllDoctores() {
-        return doctorRepository.findByActivoTrue();
+        List<Doctor> doctores = doctorRepository.findByActivoTrue();
+        doctores.forEach(doctor -> doctor.getEspecialidad());
+        return doctores;
     }
 
     public Doctor findDoctorById(Long id) {
-        return doctorRepository.findByIdAndActivoTrue(id)
+        Doctor doctor = doctorRepository.findByIdAndActivoTrue(id)
             .orElseThrow(() -> new EntityNotFoundException("Doctor no encontrado"));
+        doctor.getEspecialidad();
+        return doctor;
     }
 
     public Doctor saveDoctor(Doctor doctor) {

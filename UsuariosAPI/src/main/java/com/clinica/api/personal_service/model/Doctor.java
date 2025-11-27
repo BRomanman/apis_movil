@@ -27,6 +27,10 @@ public class Doctor {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_especialidad")
+    private Especialidad especialidad;
+
     public Doctor() {
     }
 
@@ -75,6 +79,14 @@ public class Doctor {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public Especialidad getEspecialidad() {
+        return especialidad;
+    }
+
+    public void setEspecialidad(Especialidad especialidad) {
+        this.especialidad = especialidad;
     }
 
     public Boolean getActivo() {
