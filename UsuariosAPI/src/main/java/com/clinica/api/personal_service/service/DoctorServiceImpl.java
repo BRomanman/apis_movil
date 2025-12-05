@@ -12,8 +12,12 @@ import com.clinica.api.personal_service.repository.EspecialidadRepository;
 import com.clinica.api.personal_service.repository.RolRepository;
 import jakarta.transaction.Transactional;
 import java.util.Locale;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+
 
 @Service
 @Transactional

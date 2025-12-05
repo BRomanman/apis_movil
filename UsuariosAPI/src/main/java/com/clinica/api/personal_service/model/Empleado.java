@@ -1,6 +1,8 @@
 package com.clinica.api.personal_service.model;
 
 import jakarta.persistence.*;
+
+import java.sql.Blob;
 import java.time.LocalDate;
 
 @Entity
@@ -58,6 +60,12 @@ public class Empleado {
 
     @Column(name = "tarifa_consulta")
     private Integer tarifaConsulta;
+
+    @Column(name = "foto_perfil")
+    private Blob fotoPerfil;
+
+
+
 
     public Empleado() {
     }
@@ -172,5 +180,13 @@ public class Empleado {
 
     public void setTarifaConsulta(Integer tarifaConsulta) {
         this.tarifaConsulta = tarifaConsulta;
+    }
+
+    public Blob getFotoPerfil() {
+        return fotoPerfil;
+    }
+    
+    public void setFotoPerfil(Blob fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
     }
 }

@@ -1,6 +1,8 @@
 package com.clinica.api.personal_service.model;
 
 import jakarta.persistence.*;
+
+import java.sql.Blob;
 import java.time.LocalDate;
 
 @Entity
@@ -33,6 +35,9 @@ public class Usuario {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_rol", nullable = false)
     private Rol rol;
+
+    @Column(name = "foto_perfil")
+    private Blob fotoPerfil;
 
     public Usuario() {
     }
@@ -99,5 +104,12 @@ public class Usuario {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    public Blob getFotoPerfil() {
+        return fotoPerfil;
+    }
+    public void setFotoPerfil(Blob fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
     }
 }
