@@ -1,41 +1,16 @@
-package com.clinica.api.personal_service.model;
+package com.clinica.api.personal_service.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "Usuarios")
-public class Usuario {
+public class UsuarioResponseDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_usuario")
     private Long id;
-
-    @Column(name = "nombre", nullable = false, length = 60)
     private String nombre;
-
-    @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
-
-    @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
-
-    @Column(name = "correo", nullable = false, unique = true, length = 100)
     private String correo;
-
-    @Column(name = "telefono", length = 20)
     private String telefono;
-
-    @Column(nullable = false)
-    private String contrasena;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_rol", nullable = false)
-    private Rol rol;
-
-    public Usuario() {
-    }
+    private String rol;
 
     public Long getId() {
         return id;
@@ -85,19 +60,11 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public String getContrasena() {
-        return contrasena;
-    }
-
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
-    }
-
-    public Rol getRol() {
+    public String getRol() {
         return rol;
     }
 
-    public void setRol(Rol rol) {
+    public void setRol(String rol) {
         this.rol = rol;
     }
 }

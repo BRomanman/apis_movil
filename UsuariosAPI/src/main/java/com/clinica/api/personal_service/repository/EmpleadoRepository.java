@@ -1,12 +1,12 @@
 package com.clinica.api.personal_service.repository;
 
-import com.clinica.api.personal_service.model.Usuario;
+import com.clinica.api.personal_service.model.Empleado;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
 
-    Optional<Usuario> findByCorreoIgnoreCase(String correo);
+    Optional<Empleado> findByCorreoIgnoreCase(String correo);
 }

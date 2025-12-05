@@ -1,17 +1,11 @@
 package com.clinica.api.personal_service.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import com.clinica.api.personal_service.model.Doctor;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "especialidad")
+@Table(name = "Especialidad")
 public class Especialidad {
 
     @Id
@@ -19,12 +13,11 @@ public class Especialidad {
     @Column(name = "id_especialidad")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "nombre", nullable = false, unique = true, length = 100)
     private String nombre;
 
-    @ManyToOne
-    @JoinColumn(name = "id_doctor")
-    private Doctor doctor;
+    @OneToMany(mappedBy = "especialidad", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Empleado> empleados = new ArrayList<>();
 
     public Especialidad() {
     }
@@ -45,11 +38,11 @@ public class Especialidad {
         this.nombre = nombre;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
+    public List<Empleado> getEmpleados() {
+        return empleados;
     }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
+    public void setEmpleados(List<Empleado> empleados) {
+        this.empleados = empleados;
     }
 }

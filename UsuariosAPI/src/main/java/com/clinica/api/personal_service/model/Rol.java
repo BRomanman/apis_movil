@@ -3,7 +3,7 @@ package com.clinica.api.personal_service.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "rol")
+@Table(name = "Rol")
 public class Rol {
 
     @Id
@@ -11,7 +11,7 @@ public class Rol {
     @Column(name = "id_rol")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "nombre", nullable = false, unique = true)
     private String nombre;
 
     public Rol() {
